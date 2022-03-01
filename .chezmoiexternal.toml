@@ -8,3 +8,9 @@
     url = "https://github.com/spaceship-prompt/spaceship-prompt.git"
     stripComponents = 1
     refreshPeriod = "24h"
+
+[".tmux/plugins/tpm"]
+    type = "git-repo"
+    url = "https://github.com/tmux-plugins/tpm"
+    refreshPeriod = "168h"
+
