@@ -1,0 +1,26 @@
+# This is Git's per-user configuration file.
+[user]
+# Please adapt and uncomment the following lines:
+	name = Josh Hollandsworth
+[alias]
+  p = push
+  fp = fetch --prune
+  up = !git fetch --prune && git pull --ff-only && :
+  ff = pull --ff-only
+  pf = push --force-with-lease
+  pu = push -u origin HEAD
+  aa = add :/
+  co = checkout
+  ca = commit --amend
+  can = commit --amend --no-edit
+  ci = commit
+  cm = commit -m 
+  st = status
+  new = checkout -b
+  rem = rebase origin/main
+  wip = commit -m "wip"
+  what = rev-parse --abbrev-ref HEAD
+  oldest-ancestor = !zsh -c 'diff --old-line-format='' --new-line-format='' <(git rev-list --first-parent "${1:-master}") <(git rev-list --first-parent "${2:-HEAD}") | head -1' -
+	where = rev-parse --show-toplevel
+[init]
+	defaultBranch = main
