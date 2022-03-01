@@ -28,3 +28,7 @@
   type = "git-repo"
   url = "https://github.com/pyenv/pyenv-virtualenvwrapper.git"
   refreshPeriod = "168h"
+["~/.jenv"]
+    type = "git-repo"
+    url = "https://github.com/jenv/jenv.git"
+    refreshPeriod = "168h"
