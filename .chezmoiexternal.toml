@@ -14,3 +14,17 @@
     url = "https://github.com/tmux-plugins/tpm"
     refreshPeriod = "168h"
 
+[".pyenv"]
+    type = "git-repo"
+    url = "https://github.com/pyenv/pyenv.git"
+    refreshPeriod = "168h"
+
+[".pyenv/plugins/pyenv-virtualenv"]
+  type = "git-repo"
+  url = "https://github.com/pyenv/pyenv-virtualenv.git"
+  refreshPeriod = "168h"
+
+[".pyenv/plugins/pyenv-virtualenvwrapper"]
+  type = "git-repo"
+  url = "https://github.com/pyenv/pyenv-virtualenvwrapper.git"
+  refreshPeriod = "168h"
