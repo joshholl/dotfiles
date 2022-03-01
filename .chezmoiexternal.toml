@@ -2,3 +2,9 @@
     type = "git-repo"
     url = "https://github.com/zdharma-continuum/zinit.git"
     refreshPeriod = "168h"
+
+[".spaceship_prompt"]
+    type = "git-repo"
+    url = "https://github.com/spaceship-prompt/spaceship-prompt.git"
+    stripComponents = 1
+    refreshPeriod = "24h"
