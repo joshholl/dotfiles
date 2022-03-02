@@ -40,13 +40,3 @@ brew bundle --file {{ joinPath .chezmoi.sourceDir "Brewfile" | quote }}
 
 {{ end -}}
 
-
-echo "Installing platform independant applications"
-
-mkdir .opt
-wget -O https://dlcdn.apache.org/maven/maven-3/3.8.4/binaries/apache-maven-3.8.4-bin.tar.gz
-tar zxf apache-maven-3.8.4-bin.tar.gz
-mv apache-maven-3.8.4-bin ./opt/apache-maven-3.8.4
-ln -s ./opt/apache-maven-3.8.4 ./opt/maven
-
-
