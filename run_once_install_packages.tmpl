@@ -1,6 +1,36 @@
 {{ if eq .chezmoi.os "linux" -}}
-#!/bin/sh 
-echo "Nothing here fore now"
+#!/bin/bash 
+
+# take hashes of dependent files to determine if we should install
+# 1password source setup: {{ include "sources.d/1password.sh" | sha256sum }}
+# corretto source setup: {{ include "sources.d/aws-corretto.sh" | sha256sum }}
+# vscode source setup: {{ include "sources.d/vscode.sh" | sha256sum }}
+# vscode source setup: {{ include "sources.d/adoptium.sh" | sha256sum }}
+
+
+echo "Installing 1password cli manually because they dont have an apt repo :("
+wget -O op.zip https://cache.agilebits.com/dist/1P/op/pkg/v1.12.4/op_linux_amd64_v1.12.4.zip
+unzip op.zip
+gpg --receive-keys 3FEF9748469ADBE15DA7CA80AC2D62742012EA22
+gpg --verify op.sig op
+sudo cp op /usr/local/bin
+
+
+export DEBIAN_FRONTEND=noninteractive
+sudo apt -y update && sudo apt -y install curl wget apt-transport-https dselect
+
+#execute install of sources
+sh {{ joinPath .chezmoi.sourceDir "sources.d/1password.sh" | quote }}
+sh {{ joinPath .chezmoi.sourceDir "sources.d/aws-corretto.sh" | quote }}
+sh {{ joinPath .chezmoi.sourceDir "sources.d/vscode.sh" | quote }}
+sh {{ joinPath .chezmoi.sourceDir "sources.d/adoptium.sh" | quote }}
+
+echo "Installing packages"
+sudo apt -y update
+sudo apt-cache dumpavail | sudo dpkg --merge-avail
+
+sudo dpkg --set-selections < {{ joinPath .chezmoi.sourceDir "packages.list" | quote }}
+sudo apt-get dselect-upgrade
 
 {{ else if eq .chezmoi.os "darwin" -}}
 #!/bin/sh
