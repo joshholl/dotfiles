@@ -8,8 +8,19 @@
 # for ssh logins, install and configure the libpam-umask package.
 #umask 022
 
+
+# stolen from https://superuser.com/a/39995
+pathadd() {
+    if [ -d "$1" ] && [[ ":$PATH:" != *":$1:"* ]]; then
+        PATH="${PATH:+"$PATH:"}$1"
+        export PATH
+    fi
+}
+
 # source all of the stuff in .profile d
 if [ -d "$HOME/.profile.d" ]; then
-  for f in ${HOME}/.profile.d*; do source $f; done
+  for f in ${HOME}/.profile.d/*; do 
+    source $f
+  done
 fi
 

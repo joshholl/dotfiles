@@ -1,18 +1,22 @@
 export PATH=${HOME}/bin:$PATH
-fpath=( "${ZDOTDIR:-$HOME}/.zfunctions" $fpath )
-
-autoload -Uz compinit
-
-autoload -U promptinit; promptinit
-prompt spaceship
-compinit
 
 
 ZINIT_HOME="${XDG_DATA_HOME:-${HOME}/.local/share}/zinit/zinit.git"
 source "${ZINIT_HOME}/zinit.zsh"
 
 #zinit 
+autoload -Uz compinit
 zinit snippet https://github.com/sainnhe/dotfiles/raw/master/.zsh-theme/sonokai-andromeda.zsh
+zinit light spaceship-prompt/spaceship-prompt
+
+
+fpath=( "${ZDOTDIR:-$HOME}/.zfunctions" $fpath )
+
+
+autoload -U promptinit; promptinit
+prompt spaceship
+compinit
+
 
 {{- if eq .chezmoi.os "linux" }}
 alias pbcopy='xclip -selection clipboard'
@@ -38,12 +42,14 @@ export HISTFILE=${HOME}/.zsh_history
 export HISTTIMEFORMAT="[%F %T] "
 
 
-# Set up the prompt
-
-
+# source profile stuff
+source ${HOME}/.profile
 
 # Use emacs keybindings even if our EDITOR is set to vi
 bindkey -e
+
+
+
 
 
 

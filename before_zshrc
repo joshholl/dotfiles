@@ -1,7 +1,0 @@
-private_zfn_dir=$HOME/.zfunctions
-echo "Linking spaceship prompt"
-
-
-mkdir $private_zfn_dir
-ln -sf "$HOME/.spaceship_prompt/spaceship.zsh" "${private_zfn_dir}/prompt_spaceship_setup"
-

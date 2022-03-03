@@ -4,3 +4,5 @@ sources.d/1password.sh
 sources.d/adoptium.sh
 sources.d/aws-corretto.sh
 sources.d/vscode.sh
+sources.d
+scripts
