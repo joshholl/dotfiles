@@ -1,4 +1,5 @@
 Brewfile
+Brewfile.lock.json
 packages.list
 sources.d/1password.sh
 sources.d/adoptium.sh
