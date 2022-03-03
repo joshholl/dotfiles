@@ -17,10 +17,12 @@ pathadd() {
     fi
 }
 
-# source all of the stuff in .profile d
-if [ -d "$HOME/.profile.d" ]; then
-  for f in ${HOME}/.profile.d/*; do 
-    source $f
-  done
-fi
 
+if [ -d $HOME/profile.d ]; then
+  for i in $HOME/profile.d/*.sh; do
+    if [ -r $i ]; then
+      . $i
+    fi
+  done
+  unset i
+fi
