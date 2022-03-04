@@ -6,15 +6,17 @@
 # corretto source setup: {{ include "sources.d/aws-corretto.sh" | sha256sum }}
 # vscode source setup: {{ include "sources.d/vscode.sh" | sha256sum }}
 # vscode source setup: {{ include "sources.d/adoptium.sh" | sha256sum }}
+# sbt source setup: {{ include "sources.d/sbt.sh" | sha256sum }}
 
 
 echo "Installing 1password cli manually because they dont have an apt repo :("
-wget -O op.zip https://cache.agilebits.com/dist/1P/op/pkg/v1.12.4/op_linux_amd64_v1.12.4.zip
-unzip op.zip
-gpg --receive-keys 3FEF9748469ADBE15DA7CA80AC2D62742012EA22
-gpg --verify op.sig op
-sudo cp op /usr/local/bin
-
+wget -O /tmp/op.zip https://cache.agilebits.com/dist/1P/op/pkg/v1.12.4/op_linux_amd64_v1.12.4.zip
+unzip /tmp/op.zip -d /tmp/op
+rm /tmp/op.zip
+gpg --keyserver hkps://keyserver.ubuntu.com --receive-key 3FEF9748469ADBE15DA7CA80AC2D62742012EA22
+gpg --verify /tmp/op/op.sig /tmp/op/op
+sudo mv /tmp/op/op /usr/local/bin
+sudo rm -rf /tmp/op
 
 export DEBIAN_FRONTEND=noninteractive
 sudo apt -y update && sudo apt -y install curl wget apt-transport-https dselect
@@ -24,13 +26,14 @@ sh {{ joinPath .chezmoi.sourceDir "sources.d/1password.sh" | quote }}
 sh {{ joinPath .chezmoi.sourceDir "sources.d/aws-corretto.sh" | quote }}
 sh {{ joinPath .chezmoi.sourceDir "sources.d/vscode.sh" | quote }}
 sh {{ joinPath .chezmoi.sourceDir "sources.d/adoptium.sh" | quote }}
+sh {{ joinPath .chezmoi.sourceDir "sources.d/sbt.sh" | quote }}
 
 echo "Installing packages"
 sudo apt -y update
 sudo apt-cache dumpavail | sudo dpkg --merge-avail
 
 sudo dpkg --set-selections < {{ joinPath .chezmoi.sourceDir "packages.list" | quote }}
-sudo apt-get dselect-upgrade
+sudo apt-get -y dselect-upgrade
 
 {{ else if eq .chezmoi.os "darwin" -}}
 

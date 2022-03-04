@@ -19,3 +19,4 @@ code install
 java-11-amazon-corretto-jdk     install
 temurin-11-jdk      install
 temurin-8-jdk       install
+sbt         install
