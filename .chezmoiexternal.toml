@@ -32,5 +32,3 @@
   type = "git-repo"
   url = "https://github.com/wbthomason/packer.nvim"
   refreshPeriod = "168h"
-  [".local/share/nvim/site/pack/packer/start/packer.nvim" .clone]
-    args = ["--depth 1"]
