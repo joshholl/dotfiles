@@ -5,13 +5,14 @@ ZINIT_HOME="${XDG_DATA_HOME:-${HOME}/.local/share}/zinit/zinit.git"
 source "${ZINIT_HOME}/zinit.zsh"
 
 #zinit 
+fpath=( "${ZDOTDIR:-$HOME}/.zfunctions"  "${ZDOTDIR:-$HOME}/.zsh_completions" $fpath )
 autoload -Uz compinit
+
 zinit snippet https://github.com/sainnhe/dotfiles/raw/master/.zsh-theme/sonokai-andromeda.zsh
 zinit light spaceship-prompt/spaceship-prompt
 
 
-fpath=( "${ZDOTDIR:-$HOME}/.zfunctions" $fpath )
-
+autoload -Uz compinit ; compinit
 
 autoload -U promptinit; promptinit
 prompt spaceship

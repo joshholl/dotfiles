@@ -6,7 +6,6 @@
 # corretto source setup: {{ include "sources.d/aws-corretto.sh" | sha256sum }}
 # vscode source setup: {{ include "sources.d/vscode.sh" | sha256sum }}
 # vscode source setup: {{ include "sources.d/adoptium.sh" | sha256sum }}
-# sbt source setup: {{ include "sources.d/sbt.sh" | sha256sum }}
 
 
 echo "Installing 1password cli manually because they dont have an apt repo :("
@@ -26,7 +25,6 @@ sh {{ joinPath .chezmoi.sourceDir "sources.d/1password.sh" | quote }}
 sh {{ joinPath .chezmoi.sourceDir "sources.d/aws-corretto.sh" | quote }}
 sh {{ joinPath .chezmoi.sourceDir "sources.d/vscode.sh" | quote }}
 sh {{ joinPath .chezmoi.sourceDir "sources.d/adoptium.sh" | quote }}
-sh {{ joinPath .chezmoi.sourceDir "sources.d/sbt.sh" | quote }}
 
 echo "Installing packages"
 sudo apt -y update
@@ -39,7 +37,8 @@ sudo apt-get -y dselect-upgrade
 
 #brewfile hash: {{ include "Brewfile" | sha256sum }}
 
-brew bundle --file {{ joinPath .chezmoi.sourceDir "Brewfile" | quote }}
+brew bundle --no-lock --file {{ joinPath .chezmoi.sourceDir "Brewfile" | quote }}
 
 {{ end -}}
-
+mkdir -p ${HOME}/.zsh_completions
+cs --completions zsh > ${HOME}/.zsh_completions/cs

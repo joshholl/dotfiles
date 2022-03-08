@@ -1,0 +1,22 @@
+#!/bin/bash
+
+plugins=( 
+    "nodejs"
+    "ruby"
+    "python"
+    "haskell"
+)
+
+for plugin in "${plugins[@]}"
+do
+	asdf plugin add $plugin
+    status_code=$?
+    if [ $status_code -eq 0 ] || [ $status_code -eq 2 ]; then
+        echo "Plugin is installed"
+    fi
+done
+
+
+asdf install ruby 2.6.4
+asdf install python 3.10.1
+asdf install nodejs lts
