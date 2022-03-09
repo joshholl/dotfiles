@@ -5,6 +5,7 @@ plugins=(
     "ruby"
     "python"
     "haskell"
+    "golang"
 )
 
 for plugin in "${plugins[@]}"
@@ -20,3 +21,4 @@ done
 asdf install ruby 2.6.4
 asdf install python 3.10.1
 asdf install nodejs lts
+asdf install golang latest
