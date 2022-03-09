@@ -1,0 +1,35 @@
+#!/bin/bash 
+
+echo 
+echo "    ██╗███╗   ██╗███████╗████████╗ █████╗ ██╗     ██╗     ██╗███╗   ██╗ ██████╗      ██████╗ ██████╗ ██╗   ██╗██████╗ ███████╗██╗███████╗██████╗ "
+echo "    ██║████╗  ██║██╔════╝╚══██╔══╝██╔══██╗██║     ██║     ██║████╗  ██║██╔════╝     ██╔════╝██╔═══██╗██║   ██║██╔══██╗██╔════╝██║██╔════╝██╔══██╗"
+echo "    ██║██╔██╗ ██║███████╗   ██║   ███████║██║     ██║     ██║██╔██╗ ██║██║  ███╗    ██║     ██║   ██║██║   ██║██████╔╝███████╗██║█████╗  ██████╔╝"
+echo "    ██║██║╚██╗██║╚════██║   ██║   ██╔══██║██║     ██║     ██║██║╚██╗██║██║   ██║    ██║     ██║   ██║██║   ██║██╔══██╗╚════██║██║██╔══╝  ██╔══██╗"
+echo "    ██║██║ ╚████║███████║   ██║   ██║  ██║███████╗███████╗██║██║ ╚████║╚██████╔╝    ╚██████╗╚██████╔╝╚██████╔╝██║  ██║███████║██║███████╗██║  ██║"
+echo "    ╚═╝╚═╝  ╚═══╝╚══════╝   ╚═╝   ╚═╝  ╚═╝╚══════╝╚══════╝╚═╝╚═╝  ╚═══╝ ╚═════╝      ╚═════╝ ╚═════╝  ╚═════╝ ╚═╝  ╚═╝╚══════╝╚═╝╚══════╝╚═╝  ╚═╝"
+echo "                                                                                                                                                  "
+echo 
+
+{{ if eq .chezmoi.os "linux" -}}
+host_type="pc-linux"
+{{ else if eq .chezmoi.os "darwin" -}}
+host_type="apple-darwin"
+{{ end -}}
+
+echo "Installing for host ${host_type}"
+echo
+echo
+
+if [ ! -d ${HOME}/.bin ]; then
+    mkdir -p ${HOME}/.bin
+fi
+
+curl -fL https://github.com/coursier/launchers/raw/master/cs-x86_64-${host_type}.gz | gzip -d > ${HOME}/.bin/cs
+chmod +x ${HOME}/.bin/cs
+${HOME}/.bin/cs setup
+
+if [ ! -d ${HOME}/.zsh_completions ]; then
+    mkdir -p ${HOME}/.zsh_completions
+fi
+
+${HOME}/.bin/cs --completions zsh > ${HOME}/.zsh_completions/cs

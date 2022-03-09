@@ -40,5 +40,3 @@ sudo apt-get -y dselect-upgrade
 brew bundle --no-lock --file {{ joinPath .chezmoi.sourceDir "Brewfile" | quote }}
 
 {{ end -}}
-mkdir -p ${HOME}/.zsh_completions
-cs --completions zsh > ${HOME}/.zsh_completions/cs
