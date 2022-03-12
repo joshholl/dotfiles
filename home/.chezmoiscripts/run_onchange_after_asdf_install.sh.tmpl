@@ -1,0 +1,19 @@
+#!/bin/bash
+
+echo "Setting up asdf-vm"
+set -euo pipefail
+
+ASDF_HOME=${HOME}/.asdf
+PATH=${ASDF_HOME}/bin:$PATH
+
+
+echo "Installing plugins"
+for plugin in $(cut -d' ' -f1 $HOME/.tool-versions);
+do
+    # asdf exits with error 2 if the plugin exists
+    # ignore it if thats the error 
+    asdf plugin add $plugin  || [ $? == "2" ]
+done
+pushd $HOME
+asdf install 
+popd

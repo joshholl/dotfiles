@@ -1,0 +1,12 @@
+{{- $osID := .chezmoi.os -}}
+{{- if hasKey .chezmoi.osRelease "id" -}}
+{{-   $osID = printf "%s-%s" .chezmoi.os .chezmoi.osRelease.id -}}
+{{- end -}}
+
+[data]
+    name = "Josh Hollandsworth"
+    osid = {{ $osID | quote }}
+
+[data.personal.github]
+    email = "142175+joshholl@users.noreply.github.com"
+    user = "joshholl"

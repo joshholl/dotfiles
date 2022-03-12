@@ -1,0 +1,36 @@
+{{ if eq .osid "linux-debian" "linux-ubuntu" "linux-pop" -}}
+
+{{ $packages := list
+     "bat"
+     "ffmpeg"
+     "git"
+     "htop"
+     "ispell"
+     "jq"
+     "make"
+     "neovim" 
+     "ripgrep"
+     "speedtest-cli"
+     "silversearcher-ag"
+     "tig"
+     "tldr"
+     "tmux"
+     "zsh"
+     "1password"
+     "alacritty"
+     "code" 
+-}}
+
+{{ $sudo := "sudo " -}}
+{{ if eq .chezmoi.username "root" -}}
+{{   $sudo = "" -}}
+{{ end -}}
+
+#!/bin/bash
+
+set -eufo pipefail
+
+{{ $sudo }}apt-get update
+{{ $sudo }}apt-get install -y {{ $packages | join " " }}
+
+{{ end -}}

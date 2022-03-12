@@ -1,0 +1,19 @@
+[".local/share/zinit/zinit.git"]
+    type = "git-repo"
+    url = "https://github.com/zdharma-continuum/zinit.git"
+    refreshPeriod = "168h"
+
+[".tmux/plugins/tpm"]
+    type = "git-repo"
+    url = "https://github.com/tmux-plugins/tpm"
+    refreshPeriod = "168h"
+
+[".local/share/nvim/site/pack/packer/start/packer.nvim"]
+  type = "git-repo"
+  url = "https://github.com/wbthomason/packer.nvim"
+  refreshPeriod = "168h"
+
+[".asdf"]
+  type = "git-repo"
+  url = "https://github.com/asdf-vm/asdf.git"
+  refreshPeriod = "168h"

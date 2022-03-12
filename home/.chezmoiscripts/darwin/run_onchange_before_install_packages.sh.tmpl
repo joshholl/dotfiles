@@ -1,0 +1,61 @@
+{{- if (eq .chezmoi.os "darwin") -}}
+#!/bin/bash
+
+set -eufo pipefail
+
+{{ $brews := list 
+
+"ack"
+"bash"
+"bat"
+"coreutils"
+"cmake"
+"ctags"
+"curl"
+"dos2unix"
+"emscripten"
+"ffmpeg"
+"gawk"
+"gpg"
+"gcc"
+"git"
+"gnu-sed"
+"htop"
+"iftop"
+"ispell"
+"jq"
+"kcat"
+"luarocks"
+"make"
+"neovim"
+"nuget"
+"reattach-to-user-namespace"
+"ripgrep"
+"shellcheck"
+"speedtest-cli"
+"the_silver_searcher"
+"tig"
+"tldr"
+"tmux"
+"watch"
+"wget"
+"zsh"
+-}}
+
+{{
+    $casks := list
+    "1password"
+    "1password-cli"
+    "alacritty"
+    "visual-studio-code"
+-}}
+
+brew bundle --no-lock --file=/dev/stdin <<EOF
+{{ range ($brews | sortAlpha | uniq) -}}
+brew "{{ . }}"
+{{ end -}}
+{{ range ($casks | sortAlpha | uniq) -}}
+cask "{{ . }}"
+{{ end -}}
+EOF
+{{ end -}}

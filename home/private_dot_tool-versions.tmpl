@@ -1,0 +1,33 @@
+{{- /*
+
+    simple dictionary of versions where the key is the plugin
+    and the list of versions are space separated having the prefered
+    global version first
+
+*/ -}}
+
+{{ $tools := dict
+    "nodejs" ( list 
+        "lts" 
+    )
+    "python" ( list 
+        "3.10.1" 
+        "2.7.18"  
+    )
+    "ruby" ( list 
+        "2.6.4" 
+    )
+    "golang" ( list 
+        "1.17.8" 
+    )
+    "java" (list 
+        "corretto-11.0.14.10.1" 
+        "temurin-11.0.14+101" 
+        "temurin-8.0.322+6"
+    )
+-}}
+
+
+{{ range (keys $tools | sortAlpha ) -}}
+{{ . }} {{ get $tools . | join " " }}
+{{ end -}}
