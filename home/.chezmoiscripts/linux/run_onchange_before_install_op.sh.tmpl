@@ -1,5 +1,5 @@
 #!/bin/bash
-{{ if eq .osid "linux-debian" "linux-pop" "linux-ubuntu" -}}
+{{ if eq .chezmoi.os "linux" -}}
 
 
 echo "Installing on {{ .osid -}}"

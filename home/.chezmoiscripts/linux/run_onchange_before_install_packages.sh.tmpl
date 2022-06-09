@@ -1,4 +1,4 @@
-{{ if eq .osid "linux-debian" "linux-ubuntu" "linux-pop" -}}
+{{ if eq .osid "linux-debian" "linux-ubuntu" "linux-pop" "linux-arch" -}}
 
 {{ $packages := list
      "bat"
@@ -10,16 +10,21 @@
      "make"
      "neovim" 
      "ripgrep"
-     "speedtest-cli"
-     "silversearcher-ag"
      "tig"
      "tldr"
      "tmux"
      "zsh"
-     "1password"
+     "wget"
      "alacritty"
-     "code" 
+     "1password"
 -}}
+
+{{ if eq .osid "linux-arch" | ternary "the_silver_searcher" "silversearcher-ag" -}}
+	{{ $packages = concat $packages ( list "the_silver_searcher" "visual-studio-code-bin" "icu69" "gnome-keyring" ) -}}
+{{ else }}
+	{{ $packages = concat $packages ( list  "silversearcher-ag" "code" ) -}}
+{{ end -}}
+
 
 {{ $sudo := "sudo " -}}
 {{ if eq .chezmoi.username "root" -}}
@@ -30,7 +35,12 @@
 
 set -eufo pipefail
 
-{{ $sudo }}apt-get update
-{{ $sudo }}apt-get install -y {{ $packages | join " " }}
+{{ if eq .osid "linux-arch" -}}
+	paru -Syu
+	paru -S --needed --noconfirm {{ $packages | join " " }}
+{{ else -}}	
+	{{ $sudo }}apt-get update
+	{{ $sudo }}apt-get install -y {{ $packages | join " " }}
+{{ end -}}
 
 {{ end -}}

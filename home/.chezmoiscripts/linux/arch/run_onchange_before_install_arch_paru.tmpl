@@ -1,0 +1,26 @@
+{{ if eq .osid "linux-arch" -}}
+
+
+{{ $sudo := "sudo " -}}
+{{ if eq .chezmoi.username "root" -}}
+{{   $sudo = "" -}}
+{{ end -}}
+
+#!/bin/bash
+
+set -eufo pipefail
+if ! command -v paru &> /dev/null
+then
+	{{ $sudo }} pacman -Syu
+	{{ $sudo }} pacman -S --noconfirm --needed base-devel rust
+
+	paru_temp_dir="$(mktemp -d)"
+	trap '{ rm -rf -- "$paru_temp_dir"; }' EXIT
+	git clone https://aur.archlinux.org/paru.git $paru_temp_dir
+	cd $paru_temp_dir
+
+	makepkg -si
+	cd -
+	rm -rf $paru_temp_dir
+fi
+{{ end -}}
