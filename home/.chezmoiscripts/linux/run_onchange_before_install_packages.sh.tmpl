@@ -20,7 +20,22 @@
 -}}
 
 {{ if eq .osid "linux-arch" | ternary "the_silver_searcher" "silversearcher-ag" -}}
-	{{ $packages = concat $packages ( list "the_silver_searcher" "visual-studio-code-bin" "icu69" "gnome-keyring" ) -}}
+	{{ $arch_pkgs := list 
+		"gdm"
+		"lxqt"
+		"the_silver_searcher"
+		"visual-studio-code-bin"
+		"icu69"
+		"gnome-keyring"
+		"chromium"
+		"apple-fonts"
+		"ttf-mac-fonts"
+		"pavucontrol"
+		"ttf-meslo-nerd-font-powerlevel10k"
+	-}}
+		
+
+	{{ $packages = concat $packages $arch_pkgs -}}
 {{ else }}
 	{{ $packages = concat $packages ( list  "silversearcher-ag" "code" ) -}}
 {{ end -}}
