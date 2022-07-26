@@ -1,3 +1,8 @@
+#asdf
+ASDF_DIR=${HOME}/.asdf
+
+source ${ASDF_DIR}/asdf.sh
+
 export PATH=${HOME}/bin:$PATH
 
 
@@ -5,7 +10,7 @@ ZINIT_HOME="${XDG_DATA_HOME:-${HOME}/.local/share}/zinit/zinit.git"
 source "${ZINIT_HOME}/zinit.zsh"
 
 #zinit 
-fpath=( "${ZDOTDIR:-$HOME}/.zfunctions"  "${ZDOTDIR:-$HOME}/.zsh_completions" $fpath )
+fpath=( "${ZDOTDIR:-$HOME}/.zfunctions"  "${ZDOTDIR:-$HOME}/.zsh_completions" "${ASDF_DIR}/completions" $fpath )
 autoload -Uz compinit
 
 zinit snippet https://github.com/sainnhe/dotfiles/raw/master/.zsh-theme/sonokai-andromeda.zsh
