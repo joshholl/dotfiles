@@ -1,5 +1,6 @@
-{{ if eq .osid "linux-debian" "linux-ubuntu" "linux-pop" "linux-arch" -}}
+#!/bin/bash
 
+{{ if eq .osid "linux-debian" "linux-ubuntu" "linux-pop" "linux-arch" -}}
 {{ $packages := list
      "bat"
      "ffmpeg"
@@ -46,7 +47,6 @@
 {{   $sudo = "" -}}
 {{ end -}}
 
-#!/bin/bash
 
 set -eufo pipefail
 
