@@ -20,7 +20,7 @@
      "1password"
 -}}
 
-{{ if eq .osid "linux-arch" | ternary "the_silver_searcher" "silversearcher-ag" -}}
+{{ if eq .osid "linux-arch" -}}
 	{{ $arch_pkgs := list 
 		"gdm"
 		"lxqt"
@@ -34,11 +34,20 @@
 		"pavucontrol"
 		"ttf-meslo-nerd-font-powerlevel10k"
 	-}}
-		
 
 	{{ $packages = concat $packages $arch_pkgs -}}
 {{ else }}
-	{{ $packages = concat $packages ( list  "silversearcher-ag" "code" ) -}}
+	{{ $packages = concat $packages ( list
+    "silversearcher-ag"
+    "code"
+    "libssl-dev"
+    "libreadline-dev"
+    "libbz2-dev"
+    "libsqlite3-dev"
+    "liblzma-dev"
+    "libncurses-dev"
+    "tk-dev"
+    ) -}}
 {{ end -}}
 
 
