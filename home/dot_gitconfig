@@ -2,6 +2,7 @@
 [user]
 # Please adapt and uncomment the following lines:
 	name = Josh Hollandsworth
+  email = 142175+joshholl@users.noreply.github.com
 [alias]
   p = push
   fp = fetch --prune
