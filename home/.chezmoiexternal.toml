@@ -38,3 +38,8 @@
   type = "file"
   url = "https://github.com/joshholl/dotfiles-old/raw/master/resources/MesloLGS%20NF%20Regular.ttf"
   refreshPeriod = "168h"
+
+[".local/share/fonts/VictorMono"]
+  type = "archive"
+  url = "https://rubjo.github.io/victor-mono/VictorMonoAll.zip"
+  refreshPeriod = "168h"
