@@ -1,13 +1,13 @@
 #!/bin/bash
+
 {{ if eq .chezmoi.os "linux" -}}
 
 
 echo "Installing on {{ .osid -}}"
 set -euo pipefail
 
-OP_VERSION=1.12.4
+OP_VERSION=2.6.2
 ARCH={{ .chezmoi.arch }}
-
 FILENAME=op_linux_${ARCH}_v${OP_VERSION}.zip
 echo "Installing $FILENAME"
 tempdir=$(mktemp -d)
@@ -18,7 +18,7 @@ trap cleanup EXIT
 
 cd ${tempdir}
 echo "Installing $FILENAME"
-curl -LO https://cache.agilebits.com/dist/1P/op/pkg/v${OP_VERSION}/${FILENAME}
+curl -LO https://cache.agilebits.com/dist/1P/op2/pkg/v${OP_VERSION}/${FILENAME}
 unzip ${FILENAME} op
-mv op ${HOME}/.local/bin
+mv op ${HOME}/./bin
 {{ end -}}
