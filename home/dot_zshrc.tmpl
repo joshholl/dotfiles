@@ -2,26 +2,9 @@
 ASDF_DIR=${HOME}/.asdf
 
 source ${ASDF_DIR}/asdf.sh
+eval "$(starship init zsh)"
 
 export PATH=${HOME}/bin:${HOME}/.emacs.d/bin:$PATH
-
-
-ZINIT_HOME="${XDG_DATA_HOME:-${HOME}/.local/share}/zinit/zinit.git"
-source "${ZINIT_HOME}/zinit.zsh"
-
-#zinit 
-fpath=( "${ZDOTDIR:-$HOME}/.zfunctions"  "${ZDOTDIR:-$HOME}/.zsh_completions" "${ASDF_DIR}/completions" $fpath )
-autoload -Uz compinit
-
-zinit snippet https://github.com/sainnhe/dotfiles/raw/master/.zsh-theme/sonokai-andromeda.zsh
-zinit light spaceship-prompt/spaceship-prompt
-
-
-autoload -Uz compinit ; compinit
-
-autoload -U promptinit; promptinit
-prompt spaceship
-compinit
 
 
 {{- if eq .chezmoi.os "linux" }}
