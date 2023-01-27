@@ -1,6 +1,11 @@
 #!/bin/bash
 
-echo "Setting up asdf-vm"
+# To also run anytime the .tool-versions file changes, include its hash as a comment to make this file 'dirt'
+# Tool Version Hash: {{ include "private_dot_tool-versions.tmpl" | sha256sum }}
+
+
+
+echo "Setting up asdf-vm" 
 set -euo pipefail
 
 ASDF_HOME=${HOME}/.asdf

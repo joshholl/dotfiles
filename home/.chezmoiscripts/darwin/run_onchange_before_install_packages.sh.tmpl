@@ -3,6 +3,7 @@
 
 set -eufo pipefail
 
+
 {{ $brews := list 
 
 "ack"
@@ -13,8 +14,8 @@ set -eufo pipefail
 "ctags"
 "curl"
 "dos2unix"
-"emscripten"
 "ffmpeg"
+"fd"
 "gawk"
 "gpg"
 "gcc"
@@ -40,6 +41,7 @@ set -eufo pipefail
 "watch"
 "wget"
 "zsh"
+"'emacs-plus@28', args: ['with-native-comp', 'with-modern-doom3-icon']"
 -}}
 
 {{
@@ -47,15 +49,33 @@ set -eufo pipefail
     "1password"
     "1password-cli"
     "alacritty"
+    "wezterm"
     "visual-studio-code"
 -}}
 
+
+{{
+  $taps := list 
+  "wez/wezterm"
+  "d12frosted/emacs-plus"
+
+-}}
+
+
 brew bundle --no-lock --file=/dev/stdin <<EOF
-{{ range ($brews | sortAlpha | uniq) -}}
-brew "{{ . }}"
+# Taps
+{{ range ($taps | sortAlpha | uniq) -}}
+{{ if ( contains "'" .) }} tap {{ . }} {{ else }} tap "{{ . }}" {{ end }}
 {{ end -}}
+
+# Brews 
+{{ range ($brews | sortAlpha | uniq) -}}
+{{ if ( contains "'" .) }} brew {{ . }} {{ else }} brew "{{ . }}" {{ end }}
+{{ end -}}
+
+#Casks
 {{ range ($casks | sortAlpha | uniq) -}}
-cask "{{ . }}"
+{{ if ( contains "'" .) }} cask {{ . }} {{ else }} cask "{{ . }}" {{ end }}
 {{ end -}}
 EOF
 {{ end -}}
