@@ -3,7 +3,7 @@ ASDF_DIR=${HOME}/.asdf
 
 source ${ASDF_DIR}/asdf.sh
 
-export PATH=${HOME}/bin:$PATH
+export PATH=${HOME}/bin:${HOME}/.emacs.d/bin:$PATH
 
 
 ZINIT_HOME="${XDG_DATA_HOME:-${HOME}/.local/share}/zinit/zinit.git"
@@ -83,3 +83,5 @@ zstyle ':completion:*' verbose true
 
 zstyle ':completion:*:*:kill:*:processes' list-colors '=(#b) #([0-9]#)*=0=01;31'
 zstyle ':completion:*:kill:*' command 'ps -u $USER -o pid,%cpu,tty,cputime,cmd'
+
+source "${XDG_CONFIG_HOME:-$HOME/.config}/asdf-direnv/zshrc"
