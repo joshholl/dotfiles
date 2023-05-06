@@ -24,57 +24,57 @@
   url = "https://github.com/doomemacs/doomemacs"
   refreshPeriod = "168h"
 
-[".local/share/fonts/ttf/MesloLGS_NF_Bold_Italic.ttf"]
+["{{ .fontDir }}/ttf/MesloLGS_NF_Bold_Italic.ttf"]
   type = "file"
   url = "https://github.com/joshholl/dotfiles-old/raw/master/resources/MesloLGS%20NF%20Bold%20Italic.ttf"
   refreshPeriod = "168h"
 
-[".local/share/fonts/ttf/MesloLGS_NF_Bold.ttf"]
+["{{ .fontDir }}/ttf/MesloLGS_NF_Bold.ttf"]
   type = "file"
   url = "https://github.com/joshholl/dotfiles-old/raw/master/resources/MesloLGS%20NF%20Bold.ttf"
   refreshPeriod = "168h"
 
-[".local/share/fonts/ttf/MesloLGS_NF_Italic.ttf"]
+["{{ .fontDir }}/ttf/MesloLGS_NF_Italic.ttf"]
   type = "file"
   url = "https://github.com/joshholl/dotfiles-old/raw/master/resources/MesloLGS%20NF%20Italic.ttf"
   refreshPeriod = "168h"
 
-[".local/share/fonts/ttf/MesloLGS_NF_Regular.ttf"]
+["{{ .fontDir }}/ttf/MesloLGS_NF_Regular.ttf"]
   type = "file"
   url = "https://github.com/joshholl/dotfiles-old/raw/master/resources/MesloLGS%20NF%20Regular.ttf"
   refreshPeriod = "168h"
 
-[".local/share/fonts/VictorMono"]
+["{{ .fontDir }}/VictorMono"]
   type = "archive"
   url = "https://rubjo.github.io/victor-mono/VictorMonoAll.zip"
   refreshPeriod = "168h"
 
-[".local/share/fonts/ttf/all-the-icons.ttf"]
+["{{ .fontDir }}/ttf/all-the-icons.ttf"]
   type = "file"
   url = "https://github.com/domtronn/all-the-icons.el/raw/master/fonts/all-the-icons.ttf"
   refreshPeriod = "168h"
 
-[".local/share/fonts/ttf/file-icons.ttf"]
+["{{ .fontDir }}/ttf/file-icons.ttf"]
   type = "file"
   url = "https://github.com/domtronn/all-the-icons.el/raw/master/fonts/file-icons.ttf"
   refreshPeriod = "168h"
 
-[".local/share/fonts/ttf/fontawesome.ttf"]
+["{{ .fontDir }}/ttf/fontawesome.ttf"]
   type = "file"
   url = "https://github.com/domtronn/all-the-icons.el/raw/master/fonts/fontawesome.ttf"
   refreshPeriod = "168h"
 
-[".local/share/fonts/ttf/material-design-icons.ttf"]
+["{{ .fontDir }}/ttf/material-design-icons.ttf"]
   type = "file"
   url = "https://github.com/domtronn/all-the-icons.el/raw/master/fonts/material-design-icons.ttf"
   refreshPeriod = "168h"
 
-[".local/share/fonts/ttf/octicons.ttf"]
+["{{ .fontDir }}/ttf/octicons.ttf"]
   type = "file"
   url = "https://github.com/domtronn/all-the-icons.el/raw/master/fonts/octicons.ttf"
   refreshPeriod = "168h"
 
-[".local/share/fonts/ttf/weathericons.ttf"]
+["{{ .fontDir }}/ttf/weathericons.ttf"]
   type = "file"
   url = "https://github.com/domtronn/all-the-icons.el/raw/master/fonts/weathericons.ttf"
   refreshPeriod = "168h"
