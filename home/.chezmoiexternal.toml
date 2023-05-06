@@ -19,11 +19,6 @@
   refreshPeriod = "168h"
   branch = "v0.11.1"
 
-[".emacs.d"]
-  type = "git-repo"
-  url = "https://github.com/doomemacs/doomemacs"
-  refreshPeriod = "168h"
-
 ["{{ .fontDir }}/ttf/MesloLGS_NF_Bold_Italic.ttf"]
   type = "file"
   url = "https://github.com/joshholl/dotfiles-old/raw/master/resources/MesloLGS%20NF%20Bold%20Italic.ttf"
