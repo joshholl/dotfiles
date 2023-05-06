@@ -1,0 +1,15 @@
+#!/bin/env bash
+
+VERSION=20230408-112425-69ae8472
+{{ if (and (eq .chezmoi.os "linux" ) (eq .chezmoi.osRelease.id "pop" "ubuntu" "debian") ) }} 
+  {{ if eq .chezmoi.osRelease.id "pop" "ubuntu" }}
+    WEZ_DEB=wezterm-$VERSION.Ubuntu{{ .chezmoi.osRelease.versionID}}.deb
+  {{ else if eq .chezmoi.osRelease.id "debian" }}
+    WEZ_DEB=wezterm-$VERSION.Debian{{ .chezmoi.osRelease.versionID}}.deb
+  {{ end }}
+  pushd /tmp
+  curl -LO https://github.com/wez/wezterm/releases/download/$VERSION/$WEZ_DEB
+  sudo apt install -y ./$WEZ_DEB
+  rm $WEZ_DEB
+  popd
+{{ end }}
