@@ -1,7 +1,7 @@
 # This is Git's per-user configuration file.
 [user]
 # Please adapt and uncomment the following lines:
-	name = Josh Hollandsworth
+  name = Josh Hollandsworth
   email = 142175+joshholl@users.noreply.github.com
 [alias]
   p = push
@@ -22,6 +22,6 @@
   wip = commit -m "wip"
   what = rev-parse --abbrev-ref HEAD
   oldest-ancestor = !zsh -c 'diff --old-line-format='' --new-line-format='' <(git rev-list --first-parent "${1:-master}") <(git rev-list --first-parent "${2:-HEAD}") | head -1' -
-	where = rev-parse --show-toplevel
+  where = rev-parse --show-toplevel
 [init]
-	defaultBranch = main
+  defaultBranch = main
