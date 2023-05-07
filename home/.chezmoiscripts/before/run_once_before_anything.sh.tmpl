@@ -1,0 +1,24 @@
+#!/bin/bash
+
+## Before we install or get started really we need to have a base level of system utilities available. primarily curl, xcode cli tools on darwin etc
+
+{{if eq .chezmoi.os "darwin" -}}
+# Start XCode cli tools install and wait until its complete
+
+xcode-select --install &> /dev/null
+until $(xcode-select --print-path &> /dev/null); do
+  sleep 5;
+done
+
+{{ else if eq .chezmoi.os "linux" -}}
+
+    {{ if eq .chezmoi.osRelease.id "pop" "ubuntu" "debian"  }} 
+    sudo apt update && sudo apt install curl gnupg git build-essential wget software-properties-common
+    {{ end }}
+
+    {{ if eq .chezmoi.osRelease.id "arch" }}
+    sudo pacman -Syu && sudo pacman -S ca-certficates curl gnupg git base-devel rust wget
+    {{ end }}
+{{ else }}
+echo "The os and release are unknown - {{ .chezmoi.os }} {{ .chezmoi.osRelease.id }}
+{{ end }}
