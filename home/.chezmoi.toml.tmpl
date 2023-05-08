@@ -2,6 +2,8 @@
 {{- if hasKey .chezmoi.osRelease "id" -}}
 {{-   $osID = printf "%s-%s" .chezmoi.os .chezmoi.osRelease.id -}}
 {{- end -}}
+{{- $weztermVersion := "20230408-112425-69ae8472" -}}
+
 
 [data]
     name = "Josh Hollandsworth"
@@ -12,4 +14,10 @@
     email = "142175+joshholl@users.noreply.github.com"
     user = "joshholl"
 
-
+[data.packages]
+    dbeaverCE = {{- if eq .chezmoi.os "darwin" -}} "dbeaver-community" {{- else if eq $osID "linux-debian" "linux-ubuntu" "linux-pop" -}} "dbeaver-ce" {{- else if eq $osID "linux-arch" -}} dbeaver-git {{- end }}
+    fdFind = {{- if eq .chezmoi.os "darwin" -}} "fd" {{- else if eq $osID "linux-debian" "linux-ubuntu" "linux-pop" -}} "fd-find" {{- else if eq $osID "linux-arch" -}} "fd" {{- end }}
+    silverSearcher = {{- if eq .chezmoi.os "darwin" -}} "the_silver_searcher" {{- else if eq $osID "linux-debian" "linux-ubuntu" "linux-pop" -}} "silversearcher-ag" {{- else if eq $osID "linux-arch" -}} "the_silver_searcher" {{- end }}
+    vsCode = {{- if eq .chezmoi.os "darwin" -}} "visual-studio-code" {{- else if eq $osID "linux-debian" "linux-ubuntu" "linux-pop" -}} "code" {{- else if eq $osID "linux-arch" -}} "visual-studio-code-bin" {{- end }}
+    wezterm = {{- if eq .chezmoi.os "darwin" -}} "wezterm" {{- else if eq $osID "linux-ubuntu" "linux-pop" -}} "wezterm-{{ $weztermVersion}}.Ubuntu{{ .chezmoi.osRelease.versionID}}.deb" {{- else if eq $osID "linux-debian" -}} "wezterm-{{ $weztermVersion}}.Debian{{ .chezmoi.osRelease.versionID}}.deb" {{- else if eq $osID "linux-arch" -}} "wezterm" {{- end }}
+    brave = {{- if (or (and (eq .chezmoi.os "darwin") (ne .chezmoi.hostname "C02D395DMD6M")) ( eq $osID "linux-debian" "linux-pop" "linux-ubuntu")) -}} "brave-browser" {{- else if eq $osID "linux-arch" -}} "brave-bin" {{- else -}} ""{{- end }} 
