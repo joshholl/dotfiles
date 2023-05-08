@@ -17,7 +17,8 @@
   type = "git-repo"
   url = "https://github.com/asdf-vm/asdf.git"
   refreshPeriod = "168h"
-  branch = "v0.11.1"
+  [".asdf".pull]
+    args = [ "--force", "origin", "v0.11.3"]
 
 ["{{ .fontDir }}/ttf/MesloLGS_NF_Bold_Italic.ttf"]
   type = "file"
