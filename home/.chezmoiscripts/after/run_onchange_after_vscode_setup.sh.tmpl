@@ -1,0 +1,12 @@
+#!/bin/bash
+
+#Based on https://github.com/MarkBorcherding/dotfiles/blob/master/bin/setup-vscode
+
+EXTENSIONS=(
+    vscodevim.vim
+    kamikillerto.vscode-colorize
+    editorconfig.editorconfig
+    sainnhe.everforest
+)
+echo "Installing VS Code Extensions"
+echo $EXTENSION | xargs -n 1 code --install-extension

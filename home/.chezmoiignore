@@ -1,0 +1,7 @@
+#Ignore the appropriate VSCode Setting based on os
+{{ if ne .chezmoi.os "darwin" }}
+Library/Application Support/Code/User/settings.json
+{{ end }}
+{{ if ne .chezmoi.os "linux" }}
+.config/Code/User/settings.json
+{{ end }}

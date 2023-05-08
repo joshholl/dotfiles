@@ -1,0 +1,128 @@
+{
+    "telemetry.enableCrashReporter": false,
+    "telemetry.enableTelemetry": false,
+    "terminal.integrated.fontFamily": "MesloLGS NF",
+    "files.autoSave": "afterDelay",
+    "files.autoSaveDelay": 700,
+    "editor.fontLigatures": "'ss01'",
+    "editor.fontFamily": "Victor Mono",
+    "colorize.languages": [
+        "css",
+        "sass",
+        "scss",
+        "less",
+        "postcss",
+        "sss",
+        "stylus",
+        "xml",
+        "svg",
+        "javascript",
+        "typescript"
+    ],
+    "liveshare.allowGuestDebugControl": true,
+    "liveshare.joinDebugSessionOption": "Prompt",
+    "debug.toolBarLocation": "docked",
+    "debug.javascript.autoAttachFilter": "always",
+    "vim.insertModeKeyBindings": [
+        {
+            "before": ["j", "k"],
+            "after": ["<esc>"]
+        }
+],
+"[javascript]": {
+    "editor.defaultFormatter": "vscode.typescript-language-features"
+},
+"[vue]": {
+    "editor.defaultFormatter": "octref.vetur"
+},
+"colorize.enable_search_variables": false,
+"oracledevtools.bookmarkFileFolder": "/Users/hollandj/Oracle/oracle.oracledevtools",
+"oracledevtools.connectionConfiguration.configFilesFolder": "/Users/hollandj/Oracle/network/admin",
+"oracledevtools.connectionConfiguration.walletFileFolder": "/Users/hollandj/Oracle/network/admin",
+"javascript.updateImportsOnFileMove.enabled": "always",
+"workbench.editorAssociations": {
+    "*.xlsx": "default"
+},
+"diffEditor.codeLens": true,
+"[typescript]": {
+    "editor.defaultFormatter": "esbenp.prettier-vscode"
+
+},
+"typescript.preferences.importModuleSpecifier": "relative",
+"cSpell.userWords": [
+    "Arango",
+    "audacy",
+    "Bharath",
+    "Cystoscape",
+    "Cytoscape",
+    "Dendron",
+    "Hollandsworth's",
+    "Kubernetes",
+    "Logform",
+    "opencypher",
+    "plpgsql",
+    "Tonikutty",
+    "upsert"
+],
+"[json]": {
+    "editor.defaultFormatter": "vscode.json-language-features"
+},
+"oracledevtools.download.otherFolder": "/Users/hollandj/downloads",
+"diffEditor.ignoreTrimWhitespace": false,
+"[jsonc]": {
+    "editor.defaultFormatter": "vscode.json-language-features"
+},
+"files.exclude": {
+    "**/.classpath": true,
+    "**/.project": true,
+    "**/.settings": true,
+    "**/.factorypath": true
+},
+"editor.suggestSelection": "first",
+"vsintellicode.modify.editor.suggestSelection": "automaticallyOverrodeDefaultValue",
+"files.watcherExclude": {
+    "**/.bloop": true,
+    "**/.metals": true,
+    "**/.ammonite": true
+},
+"redhat.telemetry.enabled": false,
+"[yaml]": {
+    "editor.defaultFormatter": "redhat.vscode-yaml"
+},
+"terraform-ls.terraformExecPath": "C:\\Users\\joshh\\Bin\\terraform.exe",
+"vs-kubernetes": {
+    "vscode-kubernetes.kubectl-path.windows": "C:\\Users\\joshh\\.vs-kubernetes\\tools\\kubectl\\kubectl.exe",
+    "vscode-kubernetes.helm-path.windows": "C:\\Users\\joshh\\.vs-kubernetes\\tools\\helm\\windows-amd64\\helm.exe",
+    "vscode-kubernetes.minikube-path.windows": "C:\\Users\\joshh\\.vs-kubernetes\\tools\\minikube\\windows-amd64\\minikube.exe",
+    "vscode-kubernetes.helm-path.linux": "/home/josh/.local/state/vs-kubernetes/tools/helm/linux-amd64/helm",
+    "vscode-kubernetes.kubectl-path.linux": "/home/josh/.local/state/vs-kubernetes/tools/kubectl/kubectl",
+    "vscode-kubernetes.minikube-path.linux": "/home/josh/.local/state/vs-kubernetes/tools/minikube/linux-amd64/minikube"
+},
+"editor.multiCursorModifier": "ctrlCmd",
+"workbench.colorTheme": "Everforest Dark",
+"git.autofetch": true,
+"git.confirmSync": false,
+"editor.renderWhitespace": "none",
+"debug.node.autoAttach": "on",
+"cSpell.ignoreRegExpList": [
+    "/id\\:.+/gi"
+],
+"spellright.ignoreRegExps": [
+"/id\\:.+/gi"
+],
+"editor.tabCompletion": "on",
+"[markdown]": {
+    "editor.defaultFormatter": "yzhang.markdown-all-in-one"
+},
+"workbench.preferredDarkColorTheme": "Sonokai Andromeda",
+"workbench.preferredHighContrastColorTheme": "Sonokai Andromeda",
+"workbench.preferredHighContrastLightColorTheme": "Sonokai Andromeda",
+"markdown.extension.print.theme": "dark",
+"[css]": {
+    "editor.defaultFormatter": "esbenp.prettier-vscode"
+},
+"workbench.productIconTheme": "macos-modern",
+"[dockercompose]": {
+    "editor.defaultFormatter": "ms-azuretools.vscode-docker"
+},
+}
