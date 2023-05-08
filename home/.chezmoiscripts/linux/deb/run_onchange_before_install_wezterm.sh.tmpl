@@ -1,4 +1,4 @@
-#!/bin/env bash
+#!/bin/bash
 
 VERSION=20230408-112425-69ae8472
 {{ if (and (eq .chezmoi.os "linux" ) (eq .chezmoi.osRelease.id "pop" "ubuntu" "debian") ) }} 
@@ -12,4 +12,6 @@ VERSION=20230408-112425-69ae8472
   sudo apt install -y ./$WEZ_DEB
   rm $WEZ_DEB
   popd
+{{ else }}
+  echo "Should be installed by something else"
 {{ end }}
