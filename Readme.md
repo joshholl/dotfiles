@@ -11,6 +11,7 @@ Here is a list of software I have configurations for
 - `homebrew` - installer for macOS systems
 - `jq` - some definitions that i have found helpful
 - `nala` - apt frontend for debian systems that supports concurrent downloads
+- `neovim` - preferred editor
 - `starship` - my prompt
 - `tmux` - not used much, soon to be deleted
 - `paru` - installer for arch linux
