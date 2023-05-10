@@ -21,3 +21,6 @@
     vsCode = {{- if eq .chezmoi.os "darwin" -}} "visual-studio-code" {{- else if eq $osID "linux-debian" "linux-ubuntu" "linux-pop" -}} "code" {{- else if eq $osID "linux-arch" -}} "visual-studio-code-bin" {{- end }}
     wezterm = {{- if eq .chezmoi.os "darwin" -}} "wezterm" {{- else if eq $osID "linux-ubuntu" "linux-pop" -}} "wezterm-{{ $weztermVersion}}.Ubuntu{{ .chezmoi.osRelease.versionID}}.deb" {{- else if eq $osID "linux-debian" -}} "wezterm-{{ $weztermVersion}}.Debian{{ .chezmoi.osRelease.versionID}}.deb" {{- else if eq $osID "linux-arch" -}} "wezterm" {{- end }}
     brave = {{- if (or (and (eq .chezmoi.os "darwin") (ne .chezmoi.hostname "C02D395DMD6M")) ( eq $osID "linux-debian" "linux-pop" "linux-ubuntu")) -}} "brave-browser" {{- else if eq $osID "linux-arch" -}} "brave-bin" {{- else -}} ""{{- end }} 
+    watch = {{- if eq .chezmoi.os "darwin" }} "watch" {{- else -}} "" {{- end }}
+    ctags = {{- if eq .chezmoi.os "darwin" }} "ctags" {{- else -}} "exuberant-ctags" {{- end }}
+    sed = {{- if eq .chezmoi.os "darwin" }} "gnu-sed" {{- else -}} "sed" {{- end }}

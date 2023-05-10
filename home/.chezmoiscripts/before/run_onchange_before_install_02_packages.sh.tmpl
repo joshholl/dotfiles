@@ -8,6 +8,9 @@ set -eufo pipefail
 {{- $vsCode := .packages.vsCode  -}}
 {{- $wezterm := .packages.wezterm -}}
 {{- $brave := .packages.brave  -}}
+{{- $watch := .packages.watch  -}}
+{{- $ctags := .packages.ctags  -}}
+{{- $sed := .packages.sed  -}}
 
 {{- $guiPackages := list 
 	"1password"
@@ -23,7 +26,7 @@ set -eufo pipefail
 	"bat"
 	"cmake"
 	"coreutils"
-	"ctags"
+	$ctags
 	"curl"
 	"dos2unix"
 	$fdFind
@@ -31,7 +34,6 @@ set -eufo pipefail
 	"gawk"
 	"gcc"
 	"git"
-	"gnu-sed"
 	"gnupg"
 	"htop"
 	"iftop"
@@ -42,13 +44,14 @@ set -eufo pipefail
 	"neovim"
 	"nuget"
 	"ripgrep"
+  $sed
 	"shellcheck"
 	"speedtest-cli"
 	$silverSearcher
 	"tig"
 	"tldr"
 	"tmux"
-	"watch"
+	$watch
 	"wget"
 	"zsh"
 -}}	
@@ -68,7 +71,7 @@ brew bundle --no-lock --file=/dev/stdin <<EOF
 
 EOF
 
-{{ else if .osID "linux-ubuntu" "linux-debian" "linux-pop" }}
+{{ else if eq .osid "linux-ubuntu" "linux-debian" "linux-pop" }}
 
 {{ $sudo := "sudo " -}}
 {{ if eq .chezmoi.username "root" -}}
@@ -78,12 +81,12 @@ EOF
 ### HACK: I hate this but until I decide im not too lazy to build my own PPA, this is what i do to grab wezterm
 curl -LO https://github.com/wez/wezterm/releases/download/{{substr 8 32 $wezterm}}/{{$wezterm}}
 {{$guiPackages = without $guiPackages $wezterm}}
-{{$guiPackages = concat $guiPackages list ("./$wezterm")}}
+{{ $guiPackages = append $guiPackages (printf "./%s" $wezterm ) }}
+ls -la
+{{ $sudo -}} nala update
+{{ $sudo -}} nala install -y {{ (concat $guiPackages $cliPackages) |sortAlpha | compact | uniq | join " " }}
 
-	{{ $sudo }} nala update
-	{{ $sudo }} nala install -y {{ (concat $guiPackages $cliPackages) |sortAlpha | compact | uniq | join " " }}
-
-{{ else if .osID "linux-arch" }}
+{{ else if eq .osid "linux-arch" }}
 	paru -Syu
 	paru -S --needed --noconfirm {{ (concat $guiPackages $cliPackages) |sortAlpha | compact | uniq | join " " }} 
 {{ else }}
