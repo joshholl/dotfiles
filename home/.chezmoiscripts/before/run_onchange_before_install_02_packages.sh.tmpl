@@ -1,0 +1,94 @@
+#!/bin/bash
+
+set -eufo pipefail
+
+{{- $dbeaverCE := .packages.dbeaverCE  -}}
+{{- $fdFind := .packages.fdFind -}} 
+{{- $silverSearcher := .packages.silverSearcher -}} 
+{{- $vsCode := .packages.vsCode  -}}
+{{- $wezterm := .packages.wezterm -}}
+{{- $brave := .packages.brave  -}}
+{{- $watch := .packages.watch  -}}
+{{- $ctags := .packages.ctags  -}}
+{{- $sed := .packages.sed  -}}
+
+{{- $guiPackages := list 
+	"1password"
+	"1password-cli"
+	$vsCode
+	$brave
+	$wezterm
+
+-}}
+{{- $cliPackages := list 
+	"ack"
+	"bash"
+	"bat"
+	"cmake"
+	"coreutils"
+	$ctags
+	"curl"
+	"dos2unix"
+	$fdFind
+	"ffmpeg"
+	"gawk"
+	"gcc"
+	"git"
+	"gnupg"
+	"htop"
+	"iftop"
+	"ispell"
+	"jq"
+	"luarocks"
+	"make"
+	"neovim"
+	"nuget"
+	"ripgrep"
+  $sed
+	"shellcheck"
+	"speedtest-cli"
+	$silverSearcher
+	"tig"
+	"tldr"
+	"tmux"
+	$watch
+	"wget"
+	"zsh"
+-}}	
+
+{{ if eq .chezmoi.os "darwin" }}
+brew bundle --no-lock --file=/dev/stdin <<EOF
+
+# Brews 
+{{ range ($cliPackages | compact | sortAlpha | uniq) -}}
+{{ if ( contains "'" .) }} brew {{ . }} {{ else }} brew "{{ . }}" {{ end }}
+{{ end -}}
+
+#Casks
+{{ range ($guiPackages | compact |sortAlpha | uniq) -}}
+{{ if ( contains "'" .) }} cask {{ . }} {{ else }} cask "{{ . }}" {{ end }}
+{{ end }} 
+
+EOF
+
+{{ else if eq .osid "linux-ubuntu" "linux-debian" "linux-pop" }}
+
+{{ $sudo := "sudo " -}}
+{{ if eq .chezmoi.username "root" -}}
+{{   $sudo = "" -}}
+{{ end -}}
+
+### HACK: I hate this but until I decide im not too lazy to build my own PPA, this is what i do to grab wezterm
+curl -LO https://github.com/wez/wezterm/releases/download/{{substr 8 32 $wezterm}}/{{$wezterm}}
+{{$guiPackages = without $guiPackages $wezterm}}
+{{ $guiPackages = append $guiPackages (printf "./%s" $wezterm ) }}
+ls -la
+{{ $sudo -}} nala update
+{{ $sudo -}} nala install -y {{ (concat $guiPackages $cliPackages) |sortAlpha | compact | uniq | join " " }}
+
+{{ else if eq .osid "linux-arch" }}
+	paru -Syu
+	paru -S --needed --noconfirm {{ (concat $guiPackages $cliPackages) |sortAlpha | compact | uniq | join " " }} 
+{{ else }}
+ echo " You have an unknown OS, sorry"
+{{ end }}

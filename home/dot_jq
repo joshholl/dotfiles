@@ -1,1 +1,15 @@
- def no_nulls: walk( if type == "object" then with_entries(select(.value != null)) else . end);
+def no_nulls: walk( if type == "object" then with_entries(select(.value != null)) else . end);
+def no_qa_noise: select((.correlationId//"") | contains("cypress") | not);
+def nanos_to_ms: walk( if type == "object" then with_entries( if .key == "time_in_nanos" then {key: "time_in_ms", value: (.value / 1000000 | floor) } else . end) else . end );
+def failed_tasks: to_entries
+    | map(
+        select(
+          .value.status.tasks | map(select(.state != "RUNNING")) | length > 0
+        )
+        | .value.status.tasks = (
+            .value.status.tasks | map(select(.state != "RUNNING"))
+          )
+      )
+    | from_entries;
+def flatten_paths: . as $in | reduce leaf_paths as $path ({}; . + {($path | map(tostring)| join(".")) : $in | getpath($path)});
+def decode_JWT:  split(".") | .[1] | @base64d | fromjson;

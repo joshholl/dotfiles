@@ -2,21 +2,21 @@
 
 {{ if eq .osid "linux-debian" "linux-ubuntu" "linux-pop" "linux-arch" -}}
 {{ $packages := list
-     "bat"
-     "ffmpeg"
-     "git"
-     "htop"
-     "ispell"
-     "jq"
-     "make"
-     "neovim" 
-     "ripgrep"
-     "tig"
-     "tldr"
-     "tmux"
-     "zsh"
-     "wget"
-     "1password"
+"bat"
+"ffmpeg"
+"git"
+"htop"
+"ispell"
+"jq"
+"make"
+"neovim" 
+"ripgrep"
+"tig"
+"tldr"
+"tmux"
+"zsh"
+"wget"
+"1password"
 -}}
 
 {{ if eq .osid "linux-arch" -}}
@@ -37,16 +37,16 @@
 	{{ $packages = concat $packages $arch_pkgs -}}
 {{ else }}
 	{{ $packages = concat $packages ( list
-    "silversearcher-ag"
-    "code"
-    "libssl-dev"
-    "libreadline-dev"
-    "libbz2-dev"
-    "libsqlite3-dev"
-    "liblzma-dev"
-    "libncurses-dev"
-    "tk-dev"
-    "1password-cli"
+"silversearcher-ag"
+"code"
+"libssl-dev"
+"libreadline-dev"
+"libbz2-dev"
+"libsqlite3-dev"
+"liblzma-dev"
+"libncurses-dev"
+"tk-dev"
+"1password-cli"
     ) -}}
 {{ end -}}
 
