@@ -1,12 +1,23 @@
 #!/bin/bash
 
 #Based on https://github.com/MarkBorcherding/dotfiles/blob/master/bin/setup-vscode
-
 EXTENSIONS=(
-    vscodevim.vim
-    kamikillerto.vscode-colorize
-    editorconfig.editorconfig
-    sainnhe.everforest
+vscodevim.vim
+kamikillerto.vscode-colorize
+editorconfig.editorconfig
+sainnhe.everforest
+esbenp.prettier-vscode
+ms-azuretools.vscode-docker
+ms-vscode-remote.remote-containers
+ms-kubernetes-tools.vscode-kubernetes-tools
+googlecloudtools.cloudcode
+HashiCorp.terraform
 )
 echo "Installing VS Code Extensions"
-echo $EXTENSION | xargs -n 1 code --install-extension
+
+for extension in ${EXTENSIONS[*]}
+do
+  echo "Installing $extension"
+  code --install-extension $extension --force
+done
+
