@@ -1,0 +1,51 @@
+
+[".local/share/zinit/zinit.git"]
+    type = "git-repo"
+    url = "https://github.com/zdharma-continuum/zinit.git"
+    refreshPeriod = "168h"
+[".tmux/plugins/tpm"]
+    type = "git-repo"
+    url = "https://github.com/tmux-plugins/tpm"
+    refreshPeriod = "168h"
+[".local/share/nvim/site/pack/packer/start/packer.nvim"]
+  type = "git-repo"
+  url = "https://github.com/wbthomason/packer.nvim"
+  refreshPeriod = "168h"
+[".asdf"]
+  type = "git-repo"
+  url = "https://github.com/asdf-vm/asdf.git"
+  refreshPeriod = "168h"
+  [".asdf".pull]
+    args = [ "--force", "origin", "v0.11.3"]
+{{- $fontDir := "" }}
+{{- if eq .chezmoi.os "darwin" }}
+{{-   $fontDir = "Library/Fonts" }}
+{{- else if eq .chezmoi.os "linux" }}
+{{-   $fontDir = ".local/share/fonts" }}
+{{- end }}
+["{{ $fontDir }}/VictorMono"]
+  type = "archive"
+  url = "https://rubjo.github.io/victor-mono/VictorMonoAll.zip"
+  refreshPeriod = "168h"
+{{-   range (list
+        "MesloLGS NF Regular.ttf"
+        "MesloLGS NF Bold.ttf"
+        "MesloLGS NF Italic.ttf"
+        "MesloLGS NF Bold Italic.ttf") }}
+["{{ $fontDir }}/ttf/{{ . }}"]
+  type = "file"
+  url = "https://github.com/joshholl/dotfiles-old/raw/master/resources/{{ . }}"
+  refreshPeriod = "168h"
+{{- end }}
+{{-   range (list
+        "all-the-icons.ttf"
+        "file-icons.ttf"
+        "fontawesome.ttf"
+        "material-design-icons.ttf"
+        "octicons.ttf"
+        "weathericons.ttf") }}
+["{{ $fontDir }}/ttf/{{ . }}"]
+  type = "file"
+  url = "https://github.com/domtronn/all-the-icons.el/raw/master/fonts/{{ . }}"
+  refreshPeriod = "168h"
+{{- end }}

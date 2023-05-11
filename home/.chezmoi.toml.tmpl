@@ -8,7 +8,6 @@
 [data]
     name = "Josh Hollandsworth"
     osid = {{ $osID | quote }}
-    fontDir = {{- if eq .chezmoi.os "darwin" }} "Library/Fonts" {{ else }} ".local/share/fonts" {{ end}}
 
 [data.personal.github]
     email = "142175+joshholl@users.noreply.github.com"
