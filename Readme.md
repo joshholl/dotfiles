@@ -1,16 +1,16 @@
 # My Dotfiles
 
-So, you found my dotfiles. Like most dotfiles repo's you're not likely to be able to use my directly but I hope if you come across them and find something spiffy you use it. Also, feel free to throw up an issue if you have a suggestion. 
+So, you found my dotfiles. Like most dotfiles repo's you're not likely to be able to use mine directly but I hope if you come across them and find something spiffy you use it. Also, feel free to throw up an issue if you have a suggestion. 
 
 # Whats Here
 Here is a list of software I have configurations for
 
 - `1password` - secret manager
-- `asdf` - to manage all of my compilers/interpretters and a few tools (like terraform)
+- `asdf` - to manage all of my compilers/interpreters and a few tools (like terraform)
 - `git` - basic git config
 - `homebrew` - installer for macOS systems
 - `jq` - some definitions that i have found helpful
-- `nala` - apt frontend for debian systems that supports concurrent downloads
+- `nala` - apt frontend for Debian systems that supports concurrent downloads
 - `neovim` - preferred editor
 - `starship` - my prompt
 - `tmux` - not used much, soon to be deleted
@@ -25,12 +25,12 @@ Here is a list of software I have configurations for
 - **Arch Linux** - Not as heavily tested, but used some
 - **PopOS** - Ubuntu derivative thats my desktop os
 - **Ubuntu (Jammy)** - Typical base for virtual machines
-- **Debian (Stretch)** - OS for some homelab systems (Truenas Scale)
+- **Debian (Stretch)** - OS for some HomeLab systems (TrueNAS Scale)
 - **macOS (Ventura)** - My laptops
-    - **x86_64** - My work 2019 Macbook Pro 16 
-    - **m2** - My personal 2022 Macbook Air
+    - **x86_64** - My work 2019 MacBook Pro 16 
+    - **m2** - My personal 2022 MacBook Air
 
-## Comming soon potentially??
+## Coming soon potentially??
 
 - `FreeBSD` - used for some systems in my homelab 
 - `Windows/WSL` - I hope I never have to use Windows, but if such a time comes where I have to work on windows a significant amount I will add support
