@@ -2,6 +2,9 @@
 
 set -eufo pipefail
 
+# A few packages have different names for different os/distro/release combination
+# use some variables to try to generify this package list
+
 {{- $dbeaverCE := .packages.dbeaverCE  -}}
 {{- $fdFind := .packages.fdFind -}} 
 {{- $silverSearcher := .packages.silverSearcher -}} 
@@ -18,7 +21,7 @@ set -eufo pipefail
 	$vsCode
 	$brave
 	$wezterm
-
+	"obsidian"
 -}}
 {{- $cliPackages := list 
 	"ack"
@@ -48,6 +51,7 @@ set -eufo pipefail
 	"shellcheck"
 	"speedtest-cli"
 	$silverSearcher
+  "starship"
 	"tig"
 	"tldr"
 	"tmux"
@@ -80,7 +84,7 @@ EOF
 
 ### HACK: I hate this but until I decide im not too lazy to build my own PPA, this is what i do to grab wezterm
 curl -LO https://github.com/wez/wezterm/releases/download/{{substr 8 32 $wezterm}}/{{$wezterm}}
-{{$guiPackages = without $guiPackages $wezterm}}
+{{ $guiPackages = without $guiPackages $wezterm }}
 {{ $guiPackages = append $guiPackages (printf "./%s" $wezterm ) }}
 ls -la
 {{ $sudo -}} nala update
