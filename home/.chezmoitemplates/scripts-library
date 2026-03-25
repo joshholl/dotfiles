@@ -1,5 +1,5 @@
 #!/bin/bash
-# Reusable bash library — included in scripts via: {{ template "scripts-library" . }}
+{{- /* Reusable bash library — included in scripts via: {{ template "scripts-library" . }} */ -}}
 # Sourced line for ShellCheck: true || source ../.chezmoitemplates/scripts-library
 
 set -euo pipefail

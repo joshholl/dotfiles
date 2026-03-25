@@ -45,8 +45,8 @@
     undo = reset --soft HEAD~1
     wip  = "!git add -A && git commit -m 'WIP'"
 
-{{ if .personal }}
-# 1Password SSH signing — personal machines only
+{{ if or .personal .work }}
+# 1Password SSH signing — personal and work machines
 [gpg]
     format = ssh
 

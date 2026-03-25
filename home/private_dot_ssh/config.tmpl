@@ -9,7 +9,7 @@ Host *
     IdentitiesOnly       yes
     HashKnownHosts       yes
 
-{{ if .personal }}
+{{ if or .personal .work }}
 # ── 1Password SSH agent ───────────────────────────────────────────────────────
 # The agent socket is set via SSH_AUTH_SOCK in shell/exports.sh.
 # Add public keys to 1Password and reference them here:
