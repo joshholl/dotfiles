@@ -1,0 +1,53 @@
+{{/* ------------------------------------------------------------------ */}}
+{{/*  Machine-type flags                                                  */}}
+{{/* ------------------------------------------------------------------ */}}
+{{- $personal := false -}}
+{{- $work     := false -}}
+{{- $headless := false -}}
+
+{{/* Detect non-interactive/headless environments */}}
+{{- if or (env "CI") (env "SSH_CLIENT") (env "SSH_TTY") -}}
+{{-   $headless = true -}}
+{{- end -}}
+
+{{/* Compute a fine-grained OS id (e.g. "linux-ubuntu", "linux-arch") */}}
+{{- $osid := .chezmoi.os -}}
+{{- if and (eq .chezmoi.os "linux") .chezmoi.osRelease.id -}}
+{{-   $osid = printf "linux-%s" .chezmoi.osRelease.id -}}
+{{- end -}}
+
+{{/* Interactive machine-type prompt (persisted after first run) */}}
+{{- if stdinIsATTY -}}
+{{-   $personal = promptBoolOnce . "personal" "Is this a personal machine" -}}
+{{-   if not $personal -}}
+{{-     $work = promptBoolOnce . "work" "Is this a work machine" -}}
+{{-   end -}}
+{{- end -}}
+
+{{/* Git identity */}}
+{{- $name  := promptStringOnce . "name"  "Full name" -}}
+{{- $email := promptStringOnce . "email" "Email address" -}}
+
+{{/* ------------------------------------------------------------------ */}}
+{{/*  Config output                                                       */}}
+{{/* ------------------------------------------------------------------ */}}
+[data]
+    personal = {{ $personal }}
+    work     = {{ $work }}
+    headless = {{ $headless }}
+    osid     = {{ $osid | quote }}
+    name     = {{ $name | quote }}
+    email    = {{ $email | quote }}
+
+[diff]
+    exclude = ["scripts"]
+
+[status]
+    exclude = ["always"]
+
+{{- if $personal }}
+
+# 1Password SSH agent — only on personal machines
+[onepassword]
+    command = "op"
+{{- end }}

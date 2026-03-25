@@ -1,0 +1,52 @@
+#!/bin/sh
+# Environment variables — sourced early in shell startup
+
+# ── XDG base dirs ─────────────────────────────────────────────────────────────
+export XDG_CONFIG_HOME="${XDG_CONFIG_HOME:-$HOME/.config}"
+export XDG_DATA_HOME="${XDG_DATA_HOME:-$HOME/.local/share}"
+export XDG_CACHE_HOME="${XDG_CACHE_HOME:-$HOME/.cache}"
+export XDG_STATE_HOME="${XDG_STATE_HOME:-$HOME/.local/state}"
+
+# ── PATH ──────────────────────────────────────────────────────────────────────
+# Local binaries (mise shims, custom scripts)
+export PATH="$HOME/.local/bin:$PATH"
+
+# mise — runtime version manager
+if [ -d "$HOME/.local/share/mise/shims" ]; then
+  export PATH="$HOME/.local/share/mise/shims:$PATH"
+fi
+
+{{ if eq .chezmoi.os "darwin" }}
+# Homebrew
+if [ -x /opt/homebrew/bin/brew ]; then
+  eval "$(/opt/homebrew/bin/brew shellenv)"
+elif [ -x /usr/local/bin/brew ]; then
+  eval "$(/usr/local/bin/brew shellenv)"
+fi
+{{ end }}
+
+# ── Editor ────────────────────────────────────────────────────────────────────
+if command -v nvim >/dev/null 2>&1; then
+  export EDITOR='nvim'
+  export VISUAL='nvim'
+else
+  export EDITOR='vim'
+  export VISUAL='vim'
+fi
+
+# ── Pager ─────────────────────────────────────────────────────────────────────
+export PAGER='less'
+export LESS='-R --quit-if-one-screen --no-init'
+
+# ── Language ─────────────────────────────────────────────────────────────────
+export LANG='en_US.UTF-8'
+export LC_ALL='en_US.UTF-8'
+
+# ── 1Password SSH agent ───────────────────────────────────────────────────────
+{{ if .personal }}
+{{ if eq .chezmoi.os "darwin" }}
+export SSH_AUTH_SOCK="$HOME/Library/Group Containers/2BUA8C4S2C.com.1password/t/agent.sock"
+{{ else if eq .chezmoi.os "linux" }}
+export SSH_AUTH_SOCK="$HOME/.1password/agent.sock"
+{{ end }}
+{{ end }}

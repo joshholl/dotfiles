@@ -1,0 +1,19 @@
+# Ignore platform-specific files on the wrong OS
+{{ if ne .chezmoi.os "darwin" }}
+.chezmoiscripts/darwin
+.config/darwin
+{{ end }}
+
+{{ if ne .chezmoi.os "linux" }}
+.chezmoiscripts/linux
+.config/linux
+{{ end }}
+
+# Ignore work-only configs on personal machines (and vice-versa)
+{{ if not .work }}
+.config/work
+{{ end }}
+
+{{ if not .personal }}
+.config/personal
+{{ end }}

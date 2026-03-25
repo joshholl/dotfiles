@@ -1,0 +1,86 @@
+# Starship prompt configuration
+# Docs: https://starship.rs/config/
+
+"$schema" = 'https://starship.rs/config-schema.json'
+
+format = """
+$os\
+$username\
+$hostname\
+$directory\
+$git_branch\
+$git_state\
+$git_status\
+$fill\
+$nodejs\
+$python\
+$golang\
+$rust\
+$cmd_duration\
+$line_break\
+$character"""
+
+[os]
+disabled = false
+style    = "bold blue"
+
+[os.symbols]
+Macos   = " "
+Ubuntu  = " "
+Debian  = " "
+Arch    = " "
+Linux   = " "
+
+[username]
+show_always = false
+style_user  = "bold cyan"
+format      = "[$user]($style) "
+
+[hostname]
+ssh_only = true
+format   = "[@$hostname](bold yellow) "
+
+[directory]
+truncation_length      = 4
+truncate_to_repo       = true
+style                  = "bold cyan"
+read_only              = " "
+
+[git_branch]
+symbol = " "
+style  = "bold purple"
+
+[git_status]
+ahead      = "⇡${count}"
+behind     = "⇣${count}"
+diverged   = "⇕⇡${ahead_count}⇣${behind_count}"
+conflicted = "="
+untracked  = "?"
+stashed    = "$"
+modified   = "!"
+staged     = "+"
+renamed    = "»"
+deleted    = "✘"
+
+[fill]
+symbol = " "
+
+[cmd_duration]
+min_time = 2000
+format   = "[$duration](bold yellow) "
+
+[character]
+success_symbol = "[❯](bold green)"
+error_symbol   = "[❯](bold red)"
+
+[nodejs]
+symbol = " "
+
+[python]
+symbol = " "
+
+[golang]
+symbol = " "
+
+[rust]
+symbol = " "

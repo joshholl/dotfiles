@@ -1,0 +1,45 @@
+#!/bin/bash
+# {{ template "scripts-library" . }}
+true || source ../../.chezmoitemplates/scripts-library
+
+log_task "Installing Homebrew packages"
+
+# Install Homebrew if missing
+if ! has_cmd brew; then
+  log_info "Installing Homebrew..."
+  /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
+fi
+
+# Packages trigger re-run when the list below changes (content hash)
+brew bundle --no-lock --file=/dev/stdin <<'BREWFILE'
+# Core tools
+brew "chezmoi"
+brew "git"
+brew "gh"
+brew "curl"
+brew "wget"
+
+# Shell
+brew "zsh"
+brew "starship"
+
+# Modern CLI replacements
+brew "bat"           # cat with syntax highlighting
+brew "eza"           # ls replacement
+brew "fd"            # find replacement
+brew "fzf"           # fuzzy finder
+brew "ripgrep"       # grep replacement
+brew "jq"            # JSON processor
+brew "yq"            # YAML processor
+brew "delta"         # better git diffs
+
+# Dev tools
+brew "mise"          # runtime version manager (replaces nvm, rbenv, pyenv, etc.)
+brew "direnv"        # per-directory env vars
+
+# Fonts (requires tap)
+tap "homebrew/cask-fonts"
+cask "font-jetbrains-mono-nerd-font"
+BREWFILE
+
+log_info "Homebrew packages installed"

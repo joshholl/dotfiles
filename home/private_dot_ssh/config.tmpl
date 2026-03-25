@@ -1,0 +1,33 @@
+# ~/.ssh/config
+# Private — mode 600 enforced by chezmoi's private_ prefix
+
+# ── Global defaults ───────────────────────────────────────────────────────────
+Host *
+    ServerAliveInterval  60
+    ServerAliveCountMax  3
+    AddKeysToAgent       yes
+    IdentitiesOnly       yes
+    HashKnownHosts       yes
+
+{{ if .personal }}
+# ── 1Password SSH agent ───────────────────────────────────────────────────────
+# The agent socket is set via SSH_AUTH_SOCK in shell/exports.sh.
+# Add public keys to 1Password and reference them here:
+#
+# Host github.com
+#     IdentityFile ~/.ssh/id_github.pub  # public key only — private stays in 1Password
+{{ end }}
+
+# ── GitHub ────────────────────────────────────────────────────────────────────
+Host github.com
+    User          git
+    HostName      github.com
+
+# ── GitLab ────────────────────────────────────────────────────────────────────
+Host gitlab.com
+    User          git
+    HostName      gitlab.com
+
+# ── Local overrides ───────────────────────────────────────────────────────────
+# Add machine-specific hosts in ~/.ssh/config.local (not tracked)
+Include config.local

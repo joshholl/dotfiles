@@ -1,0 +1,74 @@
+#!/bin/bash
+# {{ template "scripts-library" . }}
+true || source ../../.chezmoitemplates/scripts-library
+
+{{ if eq .chezmoi.os "linux" }}
+{{ $osid := .osid }}
+
+log_task "Installing system packages ({{ $osid }})"
+
+{{ if hasPrefix "linux-ubuntu" $osid | or (hasPrefix "linux-debian" $osid) }}
+sudo apt-get update -qq
+
+# Packages — list drives re-run via content hash
+PACKAGES=(
+  # Core
+  curl
+  wget
+  git
+  gnupg
+  ca-certificates
+  software-properties-common
+
+  # Shell
+  zsh
+
+  # Modern CLI
+  bat
+  fd-find
+  fzf
+  jq
+  ripgrep
+)
+
+sudo apt-get install -y --no-install-recommends "${PACKAGES[@]}"
+
+# Install yq (not in apt)
+if ! has_cmd yq; then
+  log_info "Installing yq..."
+  sudo curl -sSL "https://github.com/mikefarah/yq/releases/latest/download/yq_linux_$(dpkg --print-architecture)" \
+    -o /usr/local/bin/yq && sudo chmod +x /usr/local/bin/yq
+fi
+
+# Install delta (git diff tool)
+if ! has_cmd delta; then
+  log_info "Installing git-delta..."
+  DELTA_VERSION=$(curl -fsSL https://api.github.com/repos/dandavison/delta/releases/latest | jq -r .tag_name)
+  curl -sSL "https://github.com/dandavison/delta/releases/download/${DELTA_VERSION}/git-delta_${DELTA_VERSION}_$(dpkg --print-architecture).deb" \
+    -o /tmp/git-delta.deb
+  sudo dpkg -i /tmp/git-delta.deb && rm /tmp/git-delta.deb
+fi
+
+# Install starship
+if ! has_cmd starship; then
+  log_info "Installing starship..."
+  curl -fsSL https://starship.rs/install.sh | sh -s -- --yes
+fi
+
+# Install mise (runtime version manager)
+if ! has_cmd mise; then
+  log_info "Installing mise..."
+  curl -fsSL https://mise.run | sh
+fi
+
+{{ else if hasPrefix "linux-arch" $osid }}
+sudo pacman -Syu --noconfirm
+sudo pacman -S --noconfirm --needed \
+  curl wget git gnupg \
+  zsh \
+  bat fd fzf jq ripgrep yq \
+  starship
+{{ end }}
+
+log_info "System packages installed"
+{{ end }}

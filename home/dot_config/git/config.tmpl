@@ -1,0 +1,58 @@
+[user]
+    name  = {{ .name | quote }}
+    email = {{ .email | quote }}
+
+[core]
+    autocrlf     = input
+    editor       = nvim
+    pager        = delta
+    excludesfile = ~/.config/git/ignore
+
+[init]
+    defaultBranch = main
+
+[pull]
+    rebase = true
+
+[push]
+    default       = current
+    autoSetupRemote = true
+
+[rebase]
+    autoStash = true
+
+[merge]
+    conflictstyle = zdiff3
+
+[diff]
+    algorithm    = histogram
+    colorMoved   = default
+
+[interactive]
+    diffFilter = delta --color-only
+
+[delta]
+    navigate    = true
+    light       = false
+    side-by-side = true
+    line-numbers = true
+
+[alias]
+    st   = status -sb
+    lg   = log --oneline --graph --decorate --all
+    co   = checkout
+    br   = branch
+    undo = reset --soft HEAD~1
+    wip  = "!git add -A && git commit -m 'WIP'"
+
+{{ if .personal }}
+# 1Password SSH signing — personal machines only
+[gpg]
+    format = ssh
+
+[gpg "ssh"]
+    program = "/Applications/1Password.app/Contents/MacOS/op-ssh-sign"
+
+[commit]
+    gpgsign = true
+{{ end }}
