@@ -1,0 +1,30 @@
+# ~/.config/mise/config.toml
+# Global tool declarations — managed by chezmoi.
+# Run `mise install` to install all tools, `mise upgrade` to update.
+
+[settings]
+experimental = true   # required for aqua/ubi backends
+
+[tools]
+# Shell
+starship    = "latest"
+
+# Modern CLI replacements
+bat         = "latest"
+eza         = "latest"
+fd          = "latest"
+fzf         = "latest"
+ripgrep     = "latest"
+jq          = "latest"
+yq          = "latest"
+delta       = "latest"
+direnv      = "latest"
+
+# GitHub CLI
+"github-cli" = "latest"
+
+{{ if .personal }}
+# Secrets — personal machines only
+age         = "latest"
+sops        = "latest"
+{{ end }}

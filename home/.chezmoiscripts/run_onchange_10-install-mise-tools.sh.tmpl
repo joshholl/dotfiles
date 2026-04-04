@@ -1,0 +1,18 @@
+#!/bin/bash
+# {{ template "scripts-library" . }}
+true || source ../.chezmoitemplates/scripts-library
+# Trigger re-run when the mise config changes.
+# config hash: {{ include (joinPath .chezmoi.sourceDir "home/dot_config/mise/config.toml.tmpl") | sha256sum }}
+
+set -euo pipefail
+
+log_task "Installing mise tools"
+
+if ! has_cmd mise; then
+  log_error "mise not found — run chezmoi apply again to trigger the bootstrap script first"
+  exit 1
+fi
+
+mise install --yes
+log_info "mise tools installed"
+mise list

@@ -45,8 +45,17 @@
     undo = reset --soft HEAD~1
     wip  = "!git add -A && git commit -m 'WIP'"
 
-{{ if or .personal .work }}
-# 1Password SSH signing — personal and work machines
+{{ if .personal }}
+# SSH commit signing — YubiKey resident key (native ssh-keygen, no op-ssh-sign)
+[gpg]
+    format = ssh
+
+[commit]
+    gpgsign = true
+{{ end }}
+
+{{ if .work }}
+# SSH commit signing — 1Password
 [gpg]
     format = ssh
 

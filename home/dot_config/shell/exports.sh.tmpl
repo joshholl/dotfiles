@@ -42,8 +42,8 @@ export LESS='-R --quit-if-one-screen --no-init'
 export LANG='en_US.UTF-8'
 export LC_ALL='en_US.UTF-8'
 
-# ── 1Password SSH agent ───────────────────────────────────────────────────────
-{{ if or .personal .work }}
+{{ if .work }}
+# ── 1Password SSH agent — work machines ──────────────────────────────────────
 {{ if eq .chezmoi.os "darwin" }}
 export SSH_AUTH_SOCK="$HOME/Library/Group Containers/2BUA8C4S2C.com.1password/t/agent.sock"
 {{ else if eq .chezmoi.os "linux" }}

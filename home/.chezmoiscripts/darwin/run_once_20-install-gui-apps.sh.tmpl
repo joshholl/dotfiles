@@ -1,0 +1,294 @@
+#!/bin/bash
+# {{ template "scripts-library" . }}
+true || source ../../.chezmoitemplates/scripts-library
+{{ if .personal }}
+
+set -euo pipefail
+
+# ── Helpers ───────────────────────────────────────────────────────────────────
+
+# Install a .app from a DMG.
+# Usage: install_dmg "App Name" "https://..." "App Name.app"
+#   $1 display name  $2 download URL  $3 .app name inside the volume
+install_dmg() {
+  local name="$1" url="$2" app="$3"
+  if [ -d "/Applications/$app" ]; then
+    log_info "$name already installed — skipping"
+    return 0
+  fi
+  log_info "Downloading $name..."
+  local tmp
+  tmp=$(mktemp /tmp/install-XXXXXX.dmg)
+  curl -fsSL --location -o "$tmp" "$url"
+  local volume
+  volume=$(hdiutil attach "$tmp" -quiet -nobrowse -noverify | awk 'END{print $NF}')
+  cp -R "$volume/$app" /Applications/
+  hdiutil detach "$volume" -quiet 2>/dev/null || true
+  rm -f "$tmp"
+  log_info "$name installed"
+}
+
+# Install a .pkg installer.
+# Usage: install_pkg "App Name" "https://..." "App Name.app"
+#   Skips if the .app already exists in /Applications.
+install_pkg() {
+  local name="$1" url="$2" app="$3"
+  if [ -d "/Applications/$app" ]; then
+    log_info "$name already installed — skipping"
+    return 0
+  fi
+  log_info "Downloading $name..."
+  local tmp
+  tmp=$(mktemp /tmp/install-XXXXXX.pkg)
+  curl -fsSL --location -o "$tmp" "$url"
+  sudo installer -pkg "$tmp" -target /
+  rm -f "$tmp"
+  log_info "$name installed"
+}
+
+# Fetch the browser_download_url for a GitHub release asset matching a pattern.
+# Usage: github_release_url "owner/repo" "pattern"  (pattern is a grep -E expression)
+github_release_url() {
+  local repo="$1" pattern="$2"
+  curl -fsSL "https://api.github.com/repos/$repo/releases/latest" \
+    | grep -E '"browser_download_url"' \
+    | grep -E "$pattern" \
+    | head -1 \
+    | sed 's/.*"browser_download_url": "\(.*\)"/\1/' \
+    | tr -d '"'
+}
+
+# Detect macOS major version
+macos_major() { sw_vers -productVersion | cut -d. -f1; }
+
+log_task "Installing macOS GUI apps"
+
+# ── Arch ──────────────────────────────────────────────────────────────────────
+ARCH=$(uname -m)   # arm64 or x86_64
+
+# ── YubiKey Manager ──────────────────────────────────────────────────────────
+# Required for setting FIDO2 PIN on YubiKey before generating resident SSH keys.
+if [ ! -d "/Applications/YubiKey Manager.app" ]; then
+  log_info "Fetching latest YubiKey Manager release..."
+  URL=$(github_release_url "Yubico/yubikey-manager-qt" "mac\.pkg$")
+  if [ -n "$URL" ]; then
+    install_pkg "YubiKey Manager" "$URL" "YubiKey Manager.app"
+  else
+    log_warn "Could not determine YubiKey Manager download URL — install manually from https://www.yubico.com/support/download/yubikey-manager/"
+  fi
+else
+  log_info "YubiKey Manager already installed — skipping"
+fi
+
+# ── Brave ─────────────────────────────────────────────────────────────────────
+if [ ! -d "/Applications/Brave Browser.app" ]; then
+  log_info "Downloading Brave..."
+  tmp=$(mktemp /tmp/install-XXXXXX.dmg)
+  if [ "$ARCH" = "arm64" ]; then
+    curl -fsSL --location -o "$tmp" \
+      "https://brave-browser-downloads.s3.brave.com/latest/brave-browser-stable-arm64.dmg"
+  else
+    curl -fsSL --location -o "$tmp" \
+      "https://brave-browser-downloads.s3.brave.com/latest/brave-browser-stable-x64.dmg"
+  fi
+  volume=$(hdiutil attach "$tmp" -quiet -nobrowse -noverify | awk 'END{print $NF}')
+  cp -R "$volume/Brave Browser.app" /Applications/
+  hdiutil detach "$volume" -quiet 2>/dev/null || true
+  rm -f "$tmp"
+  log_info "Brave installed"
+else
+  log_info "Brave already installed — skipping"
+fi
+
+# ── Telegram ──────────────────────────────────────────────────────────────────
+install_dmg "Telegram" "https://telegram.org/dl/macos" "Telegram.app"
+
+# ── Discord ───────────────────────────────────────────────────────────────────
+install_dmg "Discord" "https://discord.com/api/download?platform=osx" "Discord.app"
+
+# ── Docker Desktop ────────────────────────────────────────────────────────────
+if [ ! -d "/Applications/Docker.app" ]; then
+  log_info "Downloading Docker Desktop..."
+  tmp=$(mktemp /tmp/install-XXXXXX.dmg)
+  if [ "$ARCH" = "arm64" ]; then
+    curl -fsSL --location -o "$tmp" "https://desktop.docker.com/mac/main/arm64/Docker.dmg"
+  else
+    curl -fsSL --location -o "$tmp" "https://desktop.docker.com/mac/main/amd64/Docker.dmg"
+  fi
+  volume=$(hdiutil attach "$tmp" -quiet -nobrowse -noverify | awk 'END{print $NF}')
+  cp -R "$volume/Docker.app" /Applications/
+  hdiutil detach "$volume" -quiet 2>/dev/null || true
+  rm -f "$tmp"
+  log_info "Docker Desktop installed"
+else
+  log_info "Docker Desktop already installed — skipping"
+fi
+
+# ── Visual Studio Code ────────────────────────────────────────────────────────
+if [ ! -d "/Applications/Visual Studio Code.app" ]; then
+  log_info "Downloading VS Code..."
+  tmp=$(mktemp /tmp/install-XXXXXX.zip)
+  if [ "$ARCH" = "arm64" ]; then
+    curl -fsSL --location -o "$tmp" \
+      "https://code.visualstudio.com/sha/download?build=stable&os=darwin-arm64"
+  else
+    curl -fsSL --location -o "$tmp" \
+      "https://code.visualstudio.com/sha/download?build=stable&os=darwin"
+  fi
+  unzip -q "$tmp" -d /Applications/
+  rm -f "$tmp"
+  log_info "VS Code installed"
+else
+  log_info "VS Code already installed — skipping"
+fi
+
+# ── VLC ───────────────────────────────────────────────────────────────────────
+if [ ! -d "/Applications/VLC.app" ]; then
+  log_info "Downloading VLC..."
+  # Pinned version — VLC self-updates after first install
+  VLC_VERSION="3.0.21"
+  tmp=$(mktemp /tmp/install-XXXXXX.dmg)
+  if [ "$ARCH" = "arm64" ]; then
+    curl -fsSL --location -o "$tmp" \
+      "https://get.videolan.org/vlc/${VLC_VERSION}/macosx/vlc-${VLC_VERSION}-arm64.dmg"
+  else
+    curl -fsSL --location -o "$tmp" \
+      "https://get.videolan.org/vlc/${VLC_VERSION}/macosx/vlc-${VLC_VERSION}-intel64.dmg"
+  fi
+  volume=$(hdiutil attach "$tmp" -quiet -nobrowse -noverify | awk 'END{print $NF}')
+  cp -R "$volume/VLC.app" /Applications/
+  hdiutil detach "$volume" -quiet 2>/dev/null || true
+  rm -f "$tmp"
+  log_info "VLC installed"
+else
+  log_info "VLC already installed — skipping"
+fi
+
+# ── DBeaver Community ─────────────────────────────────────────────────────────
+if [ ! -d "/Applications/DBeaver.app" ]; then
+  log_info "Fetching latest DBeaver release..."
+  if [ "$ARCH" = "arm64" ]; then
+    URL=$(github_release_url "dbeaver/dbeaver" "macos-aarch64\.dmg$")
+  else
+    URL=$(github_release_url "dbeaver/dbeaver" "macos\.dmg$")
+  fi
+  install_dmg "DBeaver" "$URL" "DBeaver.app"
+else
+  log_info "DBeaver already installed — skipping"
+fi
+
+# ── Obsidian ──────────────────────────────────────────────────────────────────
+if [ ! -d "/Applications/Obsidian.app" ]; then
+  log_info "Fetching latest Obsidian release..."
+  URL=$(github_release_url "obsidianmd/obsidian-releases" "Obsidian-.*-universal\.dmg$")
+  install_dmg "Obsidian" "$URL" "Obsidian.app"
+else
+  log_info "Obsidian already installed — skipping"
+fi
+
+# ── ZimaOS Client ─────────────────────────────────────────────────────────────
+if [ ! -d "/Applications/Zima.app" ]; then
+  log_info "Fetching latest ZimaOS client release..."
+  URL=$(github_release_url "IceWhaleTech/ZimaClient" "\.dmg$")
+  if [ -n "$URL" ]; then
+    install_dmg "Zima" "$URL" "Zima.app"
+  else
+    log_warn "Could not determine ZimaOS download URL — install manually from https://github.com/IceWhaleTech/ZimaClient/releases"
+  fi
+else
+  log_info "Zima already installed — skipping"
+fi
+
+# ── FreeFileSync ──────────────────────────────────────────────────────────────
+if [ ! -d "/Applications/FreeFileSync.app" ]; then
+  log_info "Downloading FreeFileSync..."
+  # Pinned version — self-updates after first install
+  FFS_VERSION="13.9"
+  install_pkg "FreeFileSync" \
+    "https://freefilesync.org/download/FreeFileSync_${FFS_VERSION}_macOS.pkg" \
+    "FreeFileSync.app"
+else
+  log_info "FreeFileSync already installed — skipping"
+fi
+
+# ── OnyX ──────────────────────────────────────────────────────────────────────
+if [ ! -d "/Applications/OnyX.app" ]; then
+  log_info "Downloading OnyX..."
+  MACOS_VER=$(macos_major)
+  case "$MACOS_VER" in
+    15) ONYX_VERSION="4.6" ;;
+    14) ONYX_VERSION="4.5" ;;
+    13) ONYX_VERSION="4.4" ;;
+    12) ONYX_VERSION="4.3" ;;
+    *)  ONYX_VERSION="4.6" ;;  # assume latest for unknown future versions
+  esac
+  install_dmg "OnyX" \
+    "https://download.titanium-software.fr/OnyX_${ONYX_VERSION}.dmg" \
+    "OnyX.app"
+else
+  log_info "OnyX already installed — skipping"
+fi
+
+# ── Scribus ───────────────────────────────────────────────────────────────────
+if [ ! -d "/Applications/Scribus.app" ]; then
+  log_info "Downloading Scribus..."
+  # Pinned version — self-updates after first install
+  SCRIBUS_VERSION="1.6.3"
+  install_dmg "Scribus" \
+    "https://sourceforge.net/projects/scribus/files/scribus/${SCRIBUS_VERSION}/scribus-${SCRIBUS_VERSION}.dmg/download" \
+    "Scribus.app"
+else
+  log_info "Scribus already installed — skipping"
+fi
+
+# ── Adobe Creative Cloud ──────────────────────────────────────────────────────
+if [ ! -d "/Applications/Adobe Creative Cloud/Adobe Creative Cloud.app" ] && \
+   [ ! -d "/Applications/Utilities/Adobe Creative Cloud/ACC/Creative Cloud.app" ]; then
+  log_info "Downloading Adobe Creative Cloud bootstrapper..."
+  tmp=$(mktemp /tmp/install-XXXXXX.dmg)
+  curl -fsSL --location -o "$tmp" \
+    "https://prod-rel-ffc-ccm.oobesaas.adobe.com/adobe-ffc-external/core/v1/wam/download?sapCode=KCCC&productName=Creative+Cloud&os=mac&guid=$(uuidgen)&contextParams=Ry0xfE9T%3D9iQS1BUFBfTkFNRT1DcmVhdGl2ZUNsb3Vk&fetchType=CDN&installer_version=1.0&language=en_US"
+  hdiutil attach "$tmp" -quiet -nobrowse -noverify
+  sudo installer -pkg "/Volumes/Creative Cloud Installer/Creative Cloud Installer.pkg" -target /
+  hdiutil detach "/Volumes/Creative Cloud Installer" -quiet 2>/dev/null || true
+  rm -f "$tmp"
+  log_warn "Adobe Creative Cloud installed."
+  log_warn "Open Creative Cloud and install: Photoshop, Lightroom Classic"
+else
+  log_info "Adobe Creative Cloud already installed — skipping"
+fi
+
+# ── DaVinci Resolve ───────────────────────────────────────────────────────────
+if [ ! -d "/Applications/DaVinci Resolve/DaVinci Resolve.app" ] && \
+   [ ! -d "/Applications/DaVinci Resolve.app" ]; then
+{{ if .personal }}
+  # Check SOPS secrets for a stored Blackmagic download URL
+  SECRETS_FILE="{{ .chezmoi.sourceDir }}/home/.chezmoidata/secrets.sops.yaml"
+  RESOLVE_URL=""
+  if [ -f "$SECRETS_FILE" ] && has_cmd sops; then
+    RESOLVE_URL=$(sops --decrypt "$SECRETS_FILE" 2>/dev/null | grep davinci_resolve_url | sed 's/.*: "\(.*\)"/\1/' | tr -d '"' || true)
+  fi
+
+  if [ -n "$RESOLVE_URL" ]; then
+    log_info "Downloading DaVinci Resolve from stored URL..."
+    tmp=$(mktemp /tmp/install-XXXXXX.zip)
+    curl -fsSL --location -o "$tmp" "$RESOLVE_URL"
+    unzip -q "$tmp" -d /tmp/resolve-install/
+    sudo installer -pkg /tmp/resolve-install/*.pkg -target /
+    rm -rf "$tmp" /tmp/resolve-install/
+    log_info "DaVinci Resolve installed"
+  else
+    log_warn "DaVinci Resolve: no download URL found in secrets."
+    log_warn "Get a download link from https://www.blackmagicdesign.com/products/davinciresolve"
+    log_warn "Store it in secrets.sops.yaml as: davinci_resolve_url: \"<url>\""
+    log_warn "Then re-run: chezmoi apply"
+  fi
+{{ end }}
+else
+  log_info "DaVinci Resolve already installed — skipping"
+fi
+
+log_task "GUI app installation complete"
+{{ else }}
+echo "Not a personal machine — skipping GUI app install"
+{{ end }}

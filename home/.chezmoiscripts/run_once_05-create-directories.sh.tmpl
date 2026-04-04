@@ -1,0 +1,17 @@
+#!/bin/bash
+# {{ template "scripts-library" . }}
+true || source ../.chezmoitemplates/scripts-library
+
+set -euo pipefail
+
+log_task "Creating default directories"
+
+mkdir -p "$HOME/Source/joshholl"
+log_info "~/Source/joshholl"
+
+{{ if .work }}
+mkdir -p "$HOME/Source/client"
+log_info "~/Source/client"
+{{ end }}
+
+log_info "Done"

@@ -9,8 +9,8 @@ Host *
     IdentitiesOnly       yes
     HashKnownHosts       yes
 
-{{ if or .personal .work }}
-# ── 1Password SSH agent ───────────────────────────────────────────────────────
+{{ if .work }}
+# ── 1Password SSH agent — work machines ──────────────────────────────────────
 # The agent socket is set via SSH_AUTH_SOCK in shell/exports.sh.
 # Add public keys to 1Password and reference them here:
 #
@@ -22,11 +22,17 @@ Host *
 Host github.com
     User          git
     HostName      github.com
+{{ if .personal }}
+    IdentityFile  ~/.ssh/id_personal
+{{ end }}
 
 # ── GitLab ────────────────────────────────────────────────────────────────────
 Host gitlab.com
     User          git
     HostName      gitlab.com
+{{ if .personal }}
+    IdentityFile  ~/.ssh/id_personal
+{{ end }}
 
 # ── Local overrides ───────────────────────────────────────────────────────────
 # Add machine-specific hosts in ~/.ssh/config.local (not tracked)

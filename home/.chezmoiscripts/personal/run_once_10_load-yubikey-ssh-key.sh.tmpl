@@ -1,0 +1,51 @@
+#!/bin/bash
+# {{ template "scripts-library" . }}
+true || source ../../.chezmoitemplates/scripts-library
+
+set -euo pipefail
+
+log_task "Setting up personal SSH key"
+
+KEY_DIR="$HOME/.ssh"
+KEY_FILE="$KEY_DIR/id_personal"
+
+mkdir -p "$KEY_DIR"
+chmod 700 "$KEY_DIR"
+
+if [ -f "$KEY_FILE" ]; then
+  log_info "SSH key already present at $KEY_FILE — skipping"
+  log_info "Key type: $(ssh-keygen -l -f "$KEY_FILE.pub" 2>/dev/null || echo 'unknown')"
+  exit 0
+fi
+
+# ── Attempt to load YubiKey resident key ──────────────────────────────────────
+log_info "Checking for YubiKey resident key..."
+if (cd "$KEY_DIR" && ssh-keygen -K 2>/dev/null); then
+  # ssh-keygen -K writes id_ed25519_sk_rk / id_ed25519_sk_rk.pub
+  if [ -f "$KEY_DIR/id_ed25519_sk_rk" ]; then
+    mv "$KEY_DIR/id_ed25519_sk_rk"     "$KEY_FILE"
+    mv "$KEY_DIR/id_ed25519_sk_rk.pub" "$KEY_FILE.pub"
+    chmod 600 "$KEY_FILE"
+    chmod 644 "$KEY_FILE.pub"
+    log_info "YubiKey resident key loaded as $KEY_FILE"
+    log_info "Public key (add to GitHub/GitLab):"
+    cat "$KEY_FILE.pub"
+    exit 0
+  fi
+fi
+
+# ── No YubiKey present — generate a temporary software key ───────────────────
+log_warn "No YubiKey resident key found. Generating a temporary software key."
+log_warn "Replace this with your YubiKey resident key when it arrives:"
+log_warn "  cd ~/.ssh && ssh-keygen -K"
+log_warn "  mv id_ed25519_sk_rk id_personal && mv id_ed25519_sk_rk.pub id_personal.pub"
+log_warn "  chmod 600 id_personal && chmod 644 id_personal.pub"
+log_warn "Then re-register the new public key with GitHub/GitLab."
+
+ssh-keygen -t ed25519 -C "$(hostname)-temporary" -f "$KEY_FILE" -N ""
+chmod 600 "$KEY_FILE"
+chmod 644 "$KEY_FILE.pub"
+
+log_info "Temporary software key generated: $KEY_FILE"
+log_info "Public key (add to GitHub/GitLab):"
+cat "$KEY_FILE.pub"

@@ -45,9 +45,9 @@
 [status]
     exclude = ["always"]
 
-{{- if or $personal $work }}
+{{- if $work }}
 
-# 1Password SSH agent — personal and work machines
+# 1Password SSH agent — work machines only
 [onepassword]
     command = "op"
 {{- end }}

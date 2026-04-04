@@ -19,3 +19,6 @@ Thumbs.db
 *_ed25519
 .env
 .env.*
+
+# SOPS — encrypted file is safe to commit, plaintext is not
+home/.chezmoidata/secrets.yaml

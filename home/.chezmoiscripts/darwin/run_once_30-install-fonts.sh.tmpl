@@ -1,0 +1,40 @@
+#!/bin/bash
+# {{ template "scripts-library" . }}
+true || source ../../.chezmoitemplates/scripts-library
+
+set -euo pipefail
+
+log_task "Installing fonts"
+
+FONT_DIR="$HOME/Library/Fonts"
+mkdir -p "$FONT_DIR"
+
+# ── JetBrains Mono Nerd Font ─────────────────────────────────────────────────
+# Check for any existing JetBrainsMono Nerd Font file
+if ls "$FONT_DIR"/JetBrainsMonoNerdFont-*.ttf >/dev/null 2>&1; then
+  log_info "JetBrains Mono Nerd Font already installed — skipping"
+else
+  log_info "Fetching latest JetBrains Mono Nerd Font release..."
+  URL=$(curl -fsSL "https://api.github.com/repos/ryanoasis/nerd-fonts/releases/latest" \
+    | grep '"browser_download_url"' \
+    | grep 'JetBrainsMono\.tar\.xz"' \
+    | head -1 \
+    | sed 's/.*"browser_download_url": "\(.*\)"/\1/' \
+    | tr -d '"')
+
+  if [ -z "$URL" ]; then
+    log_warn "Could not determine JetBrains Mono Nerd Font URL — skipping"
+  else
+    tmp=$(mktemp /tmp/fonts-XXXXXX.tar.xz)
+    log_info "Downloading $URL..."
+    curl -fsSL --location -o "$tmp" "$URL"
+    # Extract only the TTF files we want (Regular, Bold, Italic, BoldItalic)
+    tar -xf "$tmp" -C "$FONT_DIR" --include='*.ttf' 2>/dev/null || \
+      tar -xf "$tmp" -C "$FONT_DIR" '*.ttf' 2>/dev/null || \
+      tar -xJf "$tmp" -C "$FONT_DIR"
+    rm -f "$tmp"
+    log_info "JetBrains Mono Nerd Font installed"
+  fi
+fi
+
+log_task "Font installation complete"
