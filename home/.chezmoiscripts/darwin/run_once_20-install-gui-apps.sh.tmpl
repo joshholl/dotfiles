@@ -8,75 +8,100 @@ set -euo pipefail
 # Ensure mise shims are on PATH (chezmoi runs scripts in bare bash)
 export PATH="$HOME/.local/share/mise/shims:$HOME/.local/bin:$PATH"
 
+# ── App server ────────────────────────────────────────────────────────────────
+# Set app_server_url in home/.chezmoidata/install.yaml to enable installs.
+# Each app is fetched from: $APP_SERVER/<slug>/latest.<ext>
+APP_SERVER="{{ .app_server_url }}"
+
+if [ -z "$APP_SERVER" ]; then
+  log_warn "app_server_url is not set in install.yaml — skipping GUI app installs"
+  log_warn "Set app_server_url in home/.chezmoidata/install.yaml and re-run chezmoi apply"
+  exit 0
+fi
+
+# ── Installer cache ───────────────────────────────────────────────────────────
+# iCloud syncs cached installers across all your Macs.
+# Delete a file from the cache to force a fresh download.
+INSTALLER_CACHE="$HOME/Library/Mobile Documents/com~apple~CloudDocs/App Installers"
+mkdir -p "$INSTALLER_CACHE" 2>/dev/null || true  # no-op if iCloud isn't signed in
+
+# Download a file, using the cache if available.
+# Usage: cached_curl <dest_path> <url> <cache_name>
+#   cache_name: unique filename for the cache entry (e.g. "brave.dmg")
+cached_curl() {
+  local dest="$1" url="$2" cache_name="$3"
+  local cached="$INSTALLER_CACHE/$cache_name"
+
+  if [ -f "$cached" ]; then
+    log_info "Using cached installer: $cache_name"
+    cp "$cached" "$dest"
+    return 0
+  fi
+
+  if curl -sSL --location --fail-with-body -o "$dest" "$url"; then
+    if [ -d "$INSTALLER_CACHE" ] && [ -w "$INSTALLER_CACHE" ]; then
+      cp "$dest" "$cached"
+    fi
+    return 0
+  fi
+  return 1
+}
+
 # ── Helpers ───────────────────────────────────────────────────────────────────
 
-# Install a .app from a DMG.
-# Usage: install_dmg "App Name" "https://..." "App Name.app"
-#   $1 display name  $2 download URL  $3 .app name inside the volume
+# Install a .app from a DMG served at $APP_SERVER/<slug>/<arch>/latest.dmg
+# Usage: install_dmg "Display Name" "<slug>" "<arch>" "App Name.app"
+#   Use "universal" for apps that ship a single binary for all architectures.
 install_dmg() {
-  local name="$1" url="$2" app="$3" checksum_url="${4:-}"
+  local name="$1" slug="$2" arch="$3" app="$4"
   if [ -d "/Applications/$app" ]; then
     log_info "$name already installed — skipping"
     return 0
   fi
   log_info "Downloading $name..."
-  local tmp_dir tmp
+  local tmp_dir tmp url cache_name
   tmp_dir=$(mktemp -d)
   tmp="$tmp_dir/download.dmg"
-  if ! curl -sSL --location --fail-with-body -o "$tmp" "$url"; then
-    log_warn "$name download failed — install manually"
+  url="$APP_SERVER/$slug/$arch/latest.dmg"
+  cache_name="$slug-$arch.dmg"
+  if ! cached_curl "$tmp" "$url" "$cache_name"; then
+    log_warn "$name download failed — check $url"
     rm -rf "$tmp_dir"
     return 0
-  fi
-  if [ -n "$checksum_url" ]; then
-    local expected actual
-    expected=$(curl -sSL "$checksum_url" | awk '{print $1}')
-    actual=$(shasum -a 256 "$tmp" | awk '{print $1}')
-    if [ "$expected" != "$actual" ]; then
-      log_error "$name checksum mismatch — aborting (expected: $expected  got: $actual)"
-      rm -rf "$tmp_dir"
-      return 0
-    fi
-    log_info "$name checksum OK"
   fi
   local volume
   volume=$(hdiutil attach "$tmp" -nobrowse -noverify 2>/dev/null \
     | awk -F'\t' '$NF ~ /^\/Volumes\//{gsub(/[[:space:]]+$/, "", $NF); print $NF}' \
     | tail -1)
+  if [ -z "$volume" ]; then
+    log_warn "$name: failed to mount DMG"
+    rm -rf "$tmp_dir"
+    return 0
+  fi
   cp -R "$volume/$app" /Applications/
   hdiutil detach "$volume" -quiet 2>/dev/null || true
   rm -rf "$tmp_dir"
   log_info "$name installed"
 }
 
-# Install a .pkg installer.
-# Usage: install_pkg "App Name" "https://..." "App Name.app"
-#   Skips if the .app already exists in /Applications.
+# Install a .app from a ZIP served at $APP_SERVER/<slug>/<arch>/latest.zip
+# Usage: install_zip "Display Name" "<slug>" "<arch>" "App Name.app"
 install_zip() {
-  local name="$1" url="$2" app="$3" checksum_url="${4:-}"
+  local name="$1" slug="$2" arch="$3" app="$4"
   if [ -d "/Applications/$app" ]; then
     log_info "$name already installed — skipping"
     return 0
   fi
   log_info "Downloading $name..."
-  local tmp_dir tmp
+  local tmp_dir tmp url cache_name
   tmp_dir=$(mktemp -d)
   tmp="$tmp_dir/download.zip"
-  if ! curl -sSL --location --fail-with-body -o "$tmp" "$url"; then
-    log_warn "$name download failed — install manually"
+  url="$APP_SERVER/$slug/$arch/latest.zip"
+  cache_name="$slug-$arch.zip"
+  if ! cached_curl "$tmp" "$url" "$cache_name"; then
+    log_warn "$name download failed — check $url"
     rm -rf "$tmp_dir"
     return 0
-  fi
-  if [ -n "$checksum_url" ]; then
-    local expected actual
-    expected=$(curl -sSL "$checksum_url" | awk '{print $1}')
-    actual=$(shasum -a 256 "$tmp" | awk '{print $1}')
-    if [ "$expected" != "$actual" ]; then
-      log_error "$name checksum mismatch — aborting (expected: $expected  got: $actual)"
-      rm -rf "$tmp_dir"
-      return 0
-    fi
-    log_info "$name checksum OK"
   fi
   unzip -q "$tmp" -d "$tmp_dir/extracted"
   find "$tmp_dir/extracted" -maxdepth 2 -name "*.app" -exec cp -R {} /Applications/ \;
@@ -84,289 +109,97 @@ install_zip() {
   log_info "$name installed"
 }
 
+# Install via a .pkg served at $APP_SERVER/<slug>/<arch>/latest.pkg
+# Usage: install_pkg "Display Name" "<slug>" "<arch>" "App Name.app"
 install_pkg() {
-  local name="$1" url="$2" app="$3"
-  if [ -d "/Applications/$app" ]; then
+  local name="$1" slug="$2" arch="$3" app="$4"
+  if [ -n "$app" ] && [ -d "/Applications/$app" ]; then
+    log_info "$name already installed — skipping"
+    return 0
+  fi
+  if [ -z "$app" ] && has_cmd "$name"; then
     log_info "$name already installed — skipping"
     return 0
   fi
   log_info "Downloading $name..."
-  local tmp_dir tmp
+  local tmp_dir tmp url cache_name
   tmp_dir=$(mktemp -d)
   tmp="$tmp_dir/download.pkg"
-  curl -fsSL --location -o "$tmp" "$url"
+  url="$APP_SERVER/$slug/$arch/latest.pkg"
+  cache_name="$slug-$arch.pkg"
+  if ! cached_curl "$tmp" "$url" "$cache_name"; then
+    log_warn "$name download failed — check $url"
+    rm -rf "$tmp_dir"
+    return 0
+  fi
   sudo installer -pkg "$tmp" -target /
   rm -rf "$tmp_dir"
   log_info "$name installed"
 }
 
-# Fetch the browser_download_url for a GitHub release asset matching a pattern.
-# Usage: github_release_url "owner/repo" "pattern"  (pattern is a grep -E expression)
-github_release_url() {
-  local repo="$1" pattern="$2"
-  # Run in subshell with pipefail disabled so grep no-match / curl HTTP errors
-  # don't propagate to the calling script. Returns empty string on any failure.
-  (
-    set +euo pipefail
-    curl -sSL "https://api.github.com/repos/$repo/releases/latest" \
-      | grep -E '"browser_download_url"' \
-      | grep -E "$pattern" \
-      | head -1 \
-      | sed 's/.*"browser_download_url": "\(.*\)"/\1/' \
-      | tr -d '"'
-  ) 2>/dev/null || true
-}
-
-# Detect macOS major version
-macos_major() { sw_vers -productVersion | cut -d. -f1; }
-
-log_task "Installing macOS GUI apps"
+log_task "Installing macOS GUI apps from $APP_SERVER"
 
 # ── Arch ──────────────────────────────────────────────────────────────────────
-ARCH=$(uname -m)   # arm64 or x86_64
-
-# ── YubiKey Manager ──────────────────────────────────────────────────────────
-# Required for setting FIDO2 PIN on YubiKey before generating resident SSH keys.
-if [ ! -d "/Applications/YubiKey Manager.app" ]; then
-  install_pkg "YubiKey Manager" \
-    "https://github.com/Yubico/yubikey-manager/releases/download/5.9.0/yubikey-manager-5.9.0-mac.pkg" \
-    "YubiKey Manager.app"
+if [ "$(uname -m)" = "arm64" ]; then
+  ARCH="arm64"
 else
-  log_info "YubiKey Manager already installed — skipping"
+  ARCH="x86_64"
 fi
 
-# ── Brave ─────────────────────────────────────────────────────────────────────
-if [ ! -d "/Applications/Brave Browser.app" ]; then
-  log_info "Downloading Brave..."
-  # Use GitHub's latest/download redirect — no API, no rate limits
-  if [ "$ARCH" = "arm64" ]; then
-    URL="https://github.com/brave/brave-browser/releases/latest/download/Brave-Browser-arm64.dmg"
-  else
-    URL="https://github.com/brave/brave-browser/releases/latest/download/Brave-Browser.dmg"
-  fi
-  install_dmg "Brave" "$URL" "Brave Browser.app"
-else
-  log_info "Brave already installed — skipping"
-fi
+# ── Apps ──────────────────────────────────────────────────────────────────────
 
-# ── Telegram ──────────────────────────────────────────────────────────────────
-install_dmg "Telegram" "https://telegram.org/dl/macos" "Telegram.app"
-
-# ── Discord ───────────────────────────────────────────────────────────────────
-install_dmg "Discord" "https://discord.com/api/download?platform=osx" "Discord.app"
-
-# ── Docker Desktop ────────────────────────────────────────────────────────────
-if [ ! -d "/Applications/Docker.app" ]; then
-  log_info "Downloading Docker Desktop..."
-  tmp_dir=$(mktemp -d) && tmp="$tmp_dir/download.dmg"
-  if [ "$ARCH" = "arm64" ]; then
-    curl -fsSL --location -o "$tmp" "https://desktop.docker.com/mac/main/arm64/Docker.dmg"
-  else
-    curl -fsSL --location -o "$tmp" "https://desktop.docker.com/mac/main/amd64/Docker.dmg"
-  fi
-  volume=$(hdiutil attach "$tmp" -nobrowse -noverify 2>/dev/null | grep "/Volumes/" | sed 's|.*\(/Volumes/[^\t]*\).*|\1|' | tail -1)
-  cp -R "$volume/Docker.app" /Applications/
-  hdiutil detach "$volume" -quiet 2>/dev/null || true
-  rm -rf "$tmp_dir"
-  log_info "Docker Desktop installed"
-else
-  log_info "Docker Desktop already installed — skipping"
-fi
-
-# ── Visual Studio Code ────────────────────────────────────────────────────────
-if [ ! -d "/Applications/Visual Studio Code.app" ]; then
-  log_info "Downloading VS Code..."
-  tmp_dir=$(mktemp -d) && tmp="$tmp_dir/download.zip"
-  if [ "$ARCH" = "arm64" ]; then
-    URL="https://update.code.visualstudio.com/latest/darwin-arm64/stable"
-  else
-    URL="https://update.code.visualstudio.com/latest/darwin/stable"
-  fi
-  if curl -sSL --location --fail-with-body -o "$tmp" "$URL"; then
-    unzip -q "$tmp" -d /Applications/
-    log_info "VS Code installed"
-  else
-    log_warn "VS Code download failed — install manually from https://code.visualstudio.com"
-  fi
-  rm -rf "$tmp_dir"
-else
-  log_info "VS Code already installed — skipping"
-fi
-
-# ── VLC ───────────────────────────────────────────────────────────────────────
-if [ ! -d "/Applications/VLC.app" ]; then
-  log_info "Downloading VLC..."
-  # Pinned version — VLC self-updates after first install
-  VLC_VERSION="3.0.21"
-  tmp_dir=$(mktemp -d) && tmp="$tmp_dir/download.dmg"
-  if [ "$ARCH" = "arm64" ]; then
-    URL="https://get.videolan.org/vlc/${VLC_VERSION}/macosx/vlc-${VLC_VERSION}-arm64.dmg"
-  else
-    URL="https://get.videolan.org/vlc/${VLC_VERSION}/macosx/vlc-${VLC_VERSION}-intel64.dmg"
-  fi
-  if curl -sSL --location --fail-with-body -o "$tmp" "$URL"; then
-    volume=$(hdiutil attach "$tmp" -nobrowse -noverify 2>/dev/null | grep "/Volumes/" | sed 's|.*\(/Volumes/[^\t]*\).*|\1|' | tail -1)
-    cp -R "$volume/VLC.app" /Applications/
-    hdiutil detach "$volume" -quiet 2>/dev/null || true
-    log_info "VLC installed"
-  else
-    log_warn "VLC download failed — install manually from https://www.videolan.org/vlc/"
-  fi
-  rm -rf "$tmp_dir"
-else
-  log_info "VLC already installed — skipping"
-fi
-
-# ── DBeaver Community ─────────────────────────────────────────────────────────
-if [ ! -d "/Applications/DBeaver.app" ]; then
-  if [ "$ARCH" = "arm64" ]; then
-    install_dmg "DBeaver" \
-      "https://dbeaver.io/files/dbeaver-ce-latest-macos-aarch64.dmg" \
-      "DBeaver.app" \
-      "https://dbeaver.io/files/checksum/dbeaver-ce-latest-macos-aarch64.dmg.sha256"
-  else
-    install_dmg "DBeaver" \
-      "https://dbeaver.io/files/dbeaver-ce-latest-macos.dmg" \
-      "DBeaver.app" \
-      "https://dbeaver.io/files/checksum/dbeaver-ce-latest-macos.dmg.sha256"
-  fi
-else
-  log_info "DBeaver already installed — skipping"
-fi
-
-# ── Obsidian ──────────────────────────────────────────────────────────────────
-if [ ! -d "/Applications/Obsidian.app" ]; then
-  log_info "Downloading Obsidian..."
-  URL="https://github.com/obsidianmd/obsidian-releases/releases/latest/download/Obsidian-universal.dmg"
-  install_dmg "Obsidian" "$URL" "Obsidian.app"
-else
-  log_info "Obsidian already installed — skipping"
-fi
-
-
-# ── Mountain Duck ─────────────────────────────────────────────────────────────
-# NAS/cloud mount tool (per-user license, unlimited machines)
-if [ ! -d "/Applications/Mountain Duck.app" ]; then
-  install_zip "Mountain Duck" \
-    "https://dist.mountainduck.io/Mountain%20Duck-5.2.1.28671.zip" \
-    "Mountain Duck.app"
-else
-  log_info "Mountain Duck already installed — skipping"
-fi
-
-# ── OnyX ──────────────────────────────────────────────────────────────────────
-if [ ! -d "/Applications/OnyX.app" ]; then
-  log_info "Downloading OnyX..."
-  MACOS_VER=$(macos_major)
-  # Numeric IDs from titanium-software.fr — verify older IDs at https://www.titanium-software.fr/en/onyx.html
-  case "$MACOS_VER" in
-    15) ONYX_ID="26" ;;  # Sequoia
-    14) ONYX_ID="25" ;;  # Sonoma — unverified, update if wrong
-    13) ONYX_ID="24" ;;  # Ventura — unverified, update if wrong
-    12) ONYX_ID="23" ;;  # Monterey — unverified, update if wrong
-    *)  ONYX_ID="26" ;;  # assume latest for unknown future versions
-  esac
-  install_dmg "OnyX" \
-    "https://www.titanium-software.fr/download/${ONYX_ID}/OnyX.dmg" \
-    "OnyX.app"
-else
-  log_info "OnyX already installed — skipping"
-fi
-
-# ── Scribus ───────────────────────────────────────────────────────────────────
-if [ ! -d "/Applications/Scribus.app" ]; then
-  log_info "Downloading Scribus..."
-  # Pinned version — self-updates after first install
-  SCRIBUS_VERSION="1.6.3"
-  install_dmg "Scribus" \
-    "https://sourceforge.net/projects/scribus/files/scribus/${SCRIBUS_VERSION}/scribus-${SCRIBUS_VERSION}.dmg/download" \
-    "Scribus.app"
-else
-  log_info "Scribus already installed — skipping"
-fi
+install_pkg  "mas"                  "mas"               "$ARCH"      ""
+install_pkg  "YubiKey Manager"     "yubikey-manager"   "universal"  "YubiKey Manager.app"
+install_dmg  "Brave"               "brave"             "$ARCH"      "Brave Browser.app"
+install_dmg  "Telegram"            "telegram"          "universal"  "Telegram.app"
+install_dmg  "Discord"             "discord"           "universal"  "Discord.app"
+install_dmg  "Docker Desktop"      "docker"            "$ARCH"      "Docker.app"
+install_zip  "Visual Studio Code"  "vscode"            "$ARCH"      "Visual Studio Code.app"
+install_dmg  "VLC"                 "vlc"               "$ARCH"      "VLC.app"
+install_dmg  "DBeaver"             "dbeaver"           "$ARCH"      "DBeaver.app"
+install_dmg  "Obsidian"            "obsidian"          "universal"  "Obsidian.app"
+install_zip  "Mountain Duck"       "mountain-duck"     "universal"  "Mountain Duck.app"
+install_dmg  "OnyX"                "onyx"              "universal"  "OnyX.app"
+install_dmg  "Scribus"             "scribus"           "universal"  "Scribus.app"
 
 # ── Adobe Creative Cloud ──────────────────────────────────────────────────────
 if [ ! -d "/Applications/Adobe Creative Cloud/Adobe Creative Cloud.app" ] && \
    [ ! -d "/Applications/Utilities/Adobe Creative Cloud/ACC/Creative Cloud.app" ]; then
-  log_info "Downloading Adobe Creative Cloud bootstrapper..."
+  log_info "Downloading Adobe Creative Cloud..."
   tmp_dir=$(mktemp -d) && tmp="$tmp_dir/download.dmg"
-  if curl -sSL --location --fail-with-body -o "$tmp" \
-    "https://prod-rel-ffc-ccm.oobesaas.adobe.com/adobe-ffc-external/core/v1/wam/download?sapCode=KCCC&productName=Creative+Cloud&os=mac&guid=$(uuidgen)&contextParams=Ry0xfE9T%3D9iQS1BUFBfTkFNRT1DcmVhdGl2ZUNsb3Vk&fetchType=CDN&installer_version=1.0&language=en_US"; then
-    hdiutil attach "$tmp" -nobrowse -noverify 2>/dev/null
-    sudo installer -pkg "/Volumes/Creative Cloud Installer/Creative Cloud Installer.pkg" -target /
-    hdiutil detach "/Volumes/Creative Cloud Installer" -quiet 2>/dev/null || true
-    log_warn "Adobe Creative Cloud installed. Open Creative Cloud and install: Photoshop, Lightroom Classic"
+  if cached_curl "$tmp" "$APP_SERVER/adobe-creative-cloud/universal/latest.dmg" "adobe-creative-cloud-universal.dmg"; then
+    volume=$(hdiutil attach "$tmp" -nobrowse -noverify 2>/dev/null \
+      | awk -F'\t' '$NF ~ /^\/Volumes\//{gsub(/[[:space:]]+$/, "", $NF); print $NF}' \
+      | tail -1)
+    if [ -n "$volume" ]; then
+      pkg=$(find "$volume" -name "*.pkg" | head -1)
+      if [ -n "$pkg" ]; then
+        sudo installer -pkg "$pkg" -target /
+        log_warn "Adobe Creative Cloud installed — open it and install Photoshop, Lightroom Classic"
+      else
+        log_warn "Adobe Creative Cloud: no .pkg found in DMG"
+      fi
+      hdiutil detach "$volume" -quiet 2>/dev/null || true
+    else
+      log_warn "Adobe Creative Cloud: failed to mount DMG"
+    fi
   else
-    log_warn "Adobe CC download failed — install manually from https://creativecloud.adobe.com/apps/download/creative-cloud"
+    log_warn "Adobe Creative Cloud download failed — check $APP_SERVER/adobe-creative-cloud/universal/latest.dmg"
   fi
   rm -rf "$tmp_dir"
 else
   log_info "Adobe Creative Cloud already installed — skipping"
 fi
 
-# ── DaVinci Resolve ───────────────────────────────────────────────────────────
-if [ ! -d "/Applications/DaVinci Resolve/DaVinci Resolve.app" ] && \
-   [ ! -d "/Applications/DaVinci Resolve.app" ]; then
-{{ if .personal }}
-  # Check SOPS secrets for a stored Blackmagic download URL
-  SECRETS_FILE="{{ .chezmoi.sourceDir }}/.chezmoidata/secrets.sops.yaml"
-  RESOLVE_URL=""
-  export SOPS_AGE_KEY_FILE="$HOME/.config/sops/age/keys.txt"
-  if [ ! -f "$SECRETS_FILE" ]; then
-    log_warn "DaVinci Resolve: secrets file not found at $SECRETS_FILE"
-  elif ! has_cmd sops; then
-    log_warn "DaVinci Resolve: sops not found on PATH"
-  elif [ ! -f "$SOPS_AGE_KEY_FILE" ]; then
-    log_warn "DaVinci Resolve: age key not found at $SOPS_AGE_KEY_FILE"
-  else
-    RESOLVE_URL=$(sops --decrypt "$SECRETS_FILE" 2>&1 \
-      | grep 'davinci_resolve_url' \
-      | sed 's/^[^:]*:[[:space:]]*//' \
-      | tr -d '"' \
-      || true)
-    if [ -z "$RESOLVE_URL" ]; then
-      log_warn "DaVinci Resolve: sops decrypted ok but davinci_resolve_url is empty or missing"
-    fi
-  fi
-
-  if [ -n "$RESOLVE_URL" ]; then
-    log_info "Downloading DaVinci Resolve from stored URL..."
-    tmp_dir=$(mktemp -d) && tmp="$tmp_dir/download.zip"
-    curl -sSL --location --fail-with-body -o "$tmp" "$RESOLVE_URL"
-    unzip -q "$tmp" -d "$tmp_dir/install"
-
-    # Try .pkg directly first; Blackmagic often wraps pkg inside a dmg inside the zip
-    pkg=$(find "$tmp_dir/install" -name "*.pkg" | head -1)
-    if [ -z "$pkg" ]; then
-      dmg=$(find "$tmp_dir/install" -name "*.dmg" | head -1)
-      if [ -n "$dmg" ]; then
-        log_info "DaVinci Resolve: found DMG inside ZIP — mounting..."
-        resolve_vol=$(hdiutil attach "$dmg" -nobrowse -noverify 2>/dev/null \
-          | awk -F'\t' '$NF ~ /^\/Volumes\//{gsub(/[[:space:]]+$/, "", $NF); print $NF}' \
-          | tail -1)
-        pkg=$(find "$resolve_vol" -name "*.pkg" | head -1)
-      fi
-    fi
-
-    if [ -z "$pkg" ]; then
-      log_warn "DaVinci Resolve: no .pkg found — archive contents:"
-      find "$tmp_dir/install" -maxdepth 3 | head -20 | while read -r f; do log_warn "  $f"; done
-      rm -rf "$tmp_dir"
-    else
-      sudo installer -pkg "$pkg" -target /
-      [ -n "${resolve_vol:-}" ] && hdiutil detach "$resolve_vol" -quiet 2>/dev/null || true
-      rm -rf "$tmp_dir"
-      log_info "DaVinci Resolve installed"
-    fi
-  else
-    log_warn "DaVinci Resolve: no download URL found in secrets."
-    log_warn "Get a download link from https://www.blackmagicdesign.com/products/davinciresolve"
-    log_warn "Store it in secrets.sops.yaml as: davinci_resolve_url: \"<url>\""
-    log_warn "Then re-run: chezmoi apply"
-  fi
-{{ end }}
+# ── Mac App Store ─────────────────────────────────────────────────────────────
+if ! has_cmd mas; then
+  log_warn "mas not found — skipping App Store installs (run: mise install)"
 else
-  log_info "DaVinci Resolve already installed — skipping"
+  log_task "Installing App Store apps"
+  # Verify IDs with: mas search "<name>"
+  mas install 571213070   # DaVinci Resolve
+  mas install 1451685025  # WireGuard
+  mas install 1532579087  # CamelCamelCamel
 fi
 
 log_task "GUI app installation complete"

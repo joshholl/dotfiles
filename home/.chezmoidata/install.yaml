@@ -1,0 +1,9 @@
+# App installer server configuration.
+# Set app_server_url to the root of your self-hosted installer server.
+# The install script will fetch each app from:  <app_server_url>/<slug>/latest.<ext>
+#
+# Example: if app_server_url is "https://files.home.example.com/apps", then
+#   Brave is fetched from: https://files.home.example.com/apps/brave/latest.dmg
+#
+# Leave empty to skip all GUI app installs.
+app_server_url: "https://files.recklessryno.com/apps"
