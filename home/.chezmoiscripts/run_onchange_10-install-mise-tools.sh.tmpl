@@ -2,7 +2,7 @@
 # {{ template "scripts-library" . }}
 true || source ../.chezmoitemplates/scripts-library
 # Trigger re-run when the mise config changes.
-# config hash: {{ include (joinPath .chezmoi.sourceDir "home/dot_config/mise/config.toml.tmpl") | sha256sum }}
+# config hash: {{ include (joinPath .chezmoi.sourceDir "dot_config/mise/config.toml.tmpl") | sha256sum }}
 
 set -euo pipefail
 
