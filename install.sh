@@ -80,7 +80,7 @@ echo ""
 info "Running: chezmoi init --apply $REPO"
 echo ""
 
-chezmoi init --apply "$REPO"
+chezmoi init --apply "$REPO" </dev/tty
 
 echo ""
 info "Done! Restart your shell: exec zsh"
