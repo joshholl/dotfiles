@@ -61,7 +61,7 @@ if [[ ! -f "$AGE_KEY_PATH" ]]; then
   echo ""
   tty_read "Paste age key now? [y/N] " answer
 
-  if [[ "${answer,,}" == "y" ]]; then
+  if [[ "$answer" == "y" || "$answer" == "Y" ]]; then
     mkdir -p "$(dirname "$AGE_KEY_PATH")"
     echo "Paste your age private key below, then press Ctrl+D:"
     cat </dev/tty > "$AGE_KEY_PATH"
