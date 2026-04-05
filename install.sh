@@ -63,8 +63,8 @@ if [[ ! -f "$AGE_KEY_PATH" ]]; then
 
   if [[ "$answer" == "y" || "$answer" == "Y" ]]; then
     mkdir -p "$(dirname "$AGE_KEY_PATH")"
-    echo "Paste your age private key below, then press Ctrl+D:"
-    cat </dev/tty > "$AGE_KEY_PATH"
+    read -r age_key </dev/tty
+    echo "$age_key" > "$AGE_KEY_PATH"
     chmod 600 "$AGE_KEY_PATH"
     info "Age key saved to $AGE_KEY_PATH"
   else
