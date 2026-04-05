@@ -38,13 +38,14 @@ bindkey '^[[3~' delete-char            # Delete
 
 # ── fzf ───────────────────────────────────────────────────────────────────────
 if command -v fzf >/dev/null 2>&1; then
-{{ if eq .chezmoi.os "darwin" }}
-  source "$(brew --prefix)/opt/fzf/shell/completion.zsh" 2>/dev/null
-  source "$(brew --prefix)/opt/fzf/shell/key-bindings.zsh" 2>/dev/null
-{{ else }}
-  [ -f /usr/share/doc/fzf/examples/completion.zsh ] && source /usr/share/doc/fzf/examples/completion.zsh
-  [ -f /usr/share/doc/fzf/examples/key-bindings.zsh ] && source /usr/share/doc/fzf/examples/key-bindings.zsh
-{{ end }}
+  # fzf 0.46+ ships its own shell integration
+  if fzf --zsh &>/dev/null; then
+    eval "$(fzf --zsh)"
+  else
+    # Linux system package fallback
+    [ -f /usr/share/doc/fzf/examples/completion.zsh ] && source /usr/share/doc/fzf/examples/completion.zsh
+    [ -f /usr/share/doc/fzf/examples/key-bindings.zsh ] && source /usr/share/doc/fzf/examples/key-bindings.zsh
+  fi
   export FZF_DEFAULT_OPTS='--height 40% --layout=reverse --border'
   if command -v fd >/dev/null 2>&1; then
     export FZF_DEFAULT_COMMAND='fd --type f --hidden --follow --exclude .git'

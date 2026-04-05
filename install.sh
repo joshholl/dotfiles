@@ -2,18 +2,12 @@
 # Bootstrap dotfiles on a new machine.
 #
 # Usage (repo must be public):
-#   curl -fsSL https://raw.githubusercontent.com/joshholl/dotfiles/main/install.sh | bash
+#   bash <(curl -fsSL https://raw.githubusercontent.com/joshholl/dotfiles/main/install.sh)
 #
 # Or clone first, then run directly:
 #   bash ~/Source/dotfiles/install.sh
 
 set -euo pipefail
-
-# When piped from curl, stdin is the pipe — reopen it from the terminal so all
-# subsequent `read` calls and interactive prompts work normally.
-if [[ ! -t 0 ]]; then
-  exec </dev/tty
-fi
 
 REPO="https://github.com/joshholl/dotfiles"
 AGE_KEY_PATH="$HOME/.config/sops/age/keys.txt"
