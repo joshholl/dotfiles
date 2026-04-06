@@ -63,8 +63,9 @@ vim.cmd("set whichwrap+=<,>,[,],h,l")
 vim.cmd("set iskeyword+=-")
 
 -- Disable unused providers to silence checkhealth warnings.
--- These are for old Python/Perl/Ruby-backed Vim plugins (none in use here).
--- Python development itself is handled by pyright LSP + ruff LSP + conform.nvim.
+-- These are for old Python/Perl/Ruby/Node-backed Vim plugins (none in use here).
+-- Python/JS development is handled by LSP + conform.nvim, not vim providers.
 vim.g.loaded_perl_provider = 0
 vim.g.loaded_ruby_provider = 0
 vim.g.loaded_python3_provider = 0
+vim.g.loaded_node_provider = 0

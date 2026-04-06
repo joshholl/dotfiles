@@ -7,9 +7,8 @@ return {
       "nvim-treesitter/nvim-treesitter-textobjects",
       "JoosepAlviste/nvim-ts-context-commentstring",
     },
-    config = function()
-      require("nvim-treesitter.configs").setup({
-        ensure_installed = {
+    opts = {
+      ensure_installed = {
           "bash", "c", "css", "diff", "dockerfile",
           "gitcommit", "gitignore", "go", "html",
           "javascript", "json", "jsonc", "lua", "luadoc",
@@ -60,7 +59,9 @@ return {
             swap_previous = { ["<leader>A"] = "@parameter.inner" },
           },
         },
-      })
+    },
+    config = function(_, opts)
+      require("nvim-treesitter.configs").setup(opts)
 
       -- Use treesitter for folding
       vim.opt.foldmethod = "expr"
