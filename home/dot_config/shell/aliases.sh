@@ -30,6 +30,12 @@ alias gpl='git pull'
 alias gd='git diff'
 alias gl='git log --oneline --graph --decorate --all'
 
+# ── Editor ────────────────────────────────────────────────────────────────────
+if command -v nvim >/dev/null 2>&1; then
+  alias vim='nvim'
+  alias vi='nvim'
+fi
+
 # ── Misc ──────────────────────────────────────────────────────────────────────
 alias reload='exec $SHELL -l'
 alias path='echo $PATH | tr ":" "\n"'

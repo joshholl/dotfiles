@@ -128,6 +128,12 @@ return {
         html = {},
         cssls = {},
         eslint = {},
+
+        -- ruff: Python linting/diagnostics via LSP (replaces nvim-lint for Python)
+        ruff = {},
+
+        -- stylua: Lua formatter via LSP
+        stylua = {},
       }
 
       for name, opts in pairs(servers) do
@@ -222,7 +228,7 @@ return {
       local lint = require("lint")
 
       lint.linters_by_ft = {
-        python = { "ruff" },
+        -- ruff diagnostics now come from the ruff LSP server
         javascript = { "eslint_d" },
         typescript = { "eslint_d" },
       }

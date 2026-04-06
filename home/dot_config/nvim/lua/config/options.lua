@@ -61,3 +61,10 @@ vim.api.nvim_create_autocmd("BufEnter", {
 vim.opt.shortmess:append("c")
 vim.cmd("set whichwrap+=<,>,[,],h,l")
 vim.cmd("set iskeyword+=-")
+
+-- Disable unused providers to silence checkhealth warnings.
+-- These are for old Python/Perl/Ruby-backed Vim plugins (none in use here).
+-- Python development itself is handled by pyright LSP + ruff LSP + conform.nvim.
+vim.g.loaded_perl_provider = 0
+vim.g.loaded_ruby_provider = 0
+vim.g.loaded_python3_provider = 0
