@@ -3,7 +3,9 @@
 # Run `mise install` to install all tools, `mise upgrade` to update.
 
 [settings]
-experimental = true   # required for aqua/ubi backends
+experimental = true              # required for aqua/ubi backends
+fetch_remote_versions_cache = "1d"   # only hit GitHub once per day
+fetch_remote_versions_timeout = 5    # seconds before giving up silently
 
 [tools]
 # Shell
@@ -20,6 +22,13 @@ yq          = "latest"
 delta       = "latest"
 direnv      = "latest"
 rclone      = "latest"
+fx          = "latest"
+
+# Docker without docker desktop
+lazydocker  = "latest"
+colima      = "latest"
+docker-cli  = "latest"
+docker-compose = "latest"
 
 # GitHub CLI
 "github-cli" = "latest"
