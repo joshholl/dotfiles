@@ -1,24 +1,36 @@
 return {
   -- Icons (required by many plugins)
   { "nvim-tree/nvim-web-devicons", lazy = true },
+  {
+    "echasnovski/mini.icons",
+    lazy = true,
+    opts = {},
+    init = function()
+      package.preload["nvim-web-devicons"] = function()
+        require("mini.icons").mock_nvim_web_devicons()
+        return package.loaded["nvim-web-devicons"]
+      end
+    end,
+  },
 
   -- Colorscheme
   {
-    "folke/tokyonight.nvim",
+    "catppuccin/nvim",
+    name = "catppuccin",
     lazy = false,
     priority = 1000,
     opts = {
-      style = "night",
-      transparent = false,
-      terminal_colors = true,
+      flavour = "mocha",
+      transparent_background = false,
+      term_colors = true,
       styles = {
-        comments = { italic = true },
-        keywords = { italic = true },
+        comments = { "italic" },
+        keywords = { "italic" },
       },
     },
     config = function(_, opts)
-      require("tokyonight").setup(opts)
-      vim.cmd("colorscheme tokyonight-night")
+      require("catppuccin").setup(opts)
+      vim.cmd("colorscheme catppuccin")
     end,
   },
 
@@ -28,7 +40,7 @@ return {
     event = "VeryLazy",
     opts = {
       options = {
-        theme = "tokyonight",
+        theme = "catppuccin",
         globalstatus = true,
         component_separators = "|",
         section_separators = { left = "", right = "" },
@@ -140,7 +152,7 @@ return {
     "rcarriga/nvim-notify",
     opts = {
       timeout = 3000,
-      background_colour = "#000000",
+      background_colour = "#1e1e2e",
       render = "wrapped-compact",
     },
     config = function(_, opts)

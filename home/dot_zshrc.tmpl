@@ -68,6 +68,68 @@ if command -v starship >/dev/null 2>&1; then
   eval "$(starship init zsh)"
 fi
 
+# ── Zsh plugins ───────────────────────────────────────────────────────────────
+_ZSH_PLUGIN_DIR="${XDG_DATA_HOME:-$HOME/.local/share}/zsh/plugins"
+
+# zsh-autosuggestions — Catppuccin Mocha Overlay0
+if [ -f "$_ZSH_PLUGIN_DIR/zsh-autosuggestions/zsh-autosuggestions.zsh" ]; then
+  source "$_ZSH_PLUGIN_DIR/zsh-autosuggestions/zsh-autosuggestions.zsh"
+  ZSH_AUTOSUGGEST_HIGHLIGHT_STYLE="fg=#6c7086"
+  ZSH_AUTOSUGGEST_STRATEGY=(history completion)
+fi
+
+# zsh-syntax-highlighting — Catppuccin Mocha palette
+if [ -f "$_ZSH_PLUGIN_DIR/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh" ]; then
+  source "$_ZSH_PLUGIN_DIR/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh"
+  ZSH_HIGHLIGHT_HIGHLIGHTERS=(main brackets)
+  typeset -A ZSH_HIGHLIGHT_STYLES
+  # Commands
+  ZSH_HIGHLIGHT_STYLES[unknown-token]="fg=#f38ba8"           # Red
+  ZSH_HIGHLIGHT_STYLES[command]="fg=#a6e3a1"                 # Green
+  ZSH_HIGHLIGHT_STYLES[alias]="fg=#a6e3a1"                   # Green
+  ZSH_HIGHLIGHT_STYLES[suffix-alias]="fg=#a6e3a1"            # Green
+  ZSH_HIGHLIGHT_STYLES[global-alias]="fg=#a6e3a1"            # Green
+  ZSH_HIGHLIGHT_STYLES[function]="fg=#89b4fa"                # Blue
+  ZSH_HIGHLIGHT_STYLES[builtin]="fg=#89dceb"                 # Sky
+  ZSH_HIGHLIGHT_STYLES[precommand]="fg=#89dceb,italic"       # Sky
+  ZSH_HIGHLIGHT_STYLES[reserved-word]="fg=#cba6f7"          # Mauve
+  ZSH_HIGHLIGHT_STYLES[hashed-command]="fg=#a6e3a1"          # Green
+  # Arguments & paths
+  ZSH_HIGHLIGHT_STYLES[path]="fg=#89b4fa,underline"          # Blue
+  ZSH_HIGHLIGHT_STYLES[path_prefix]="fg=#89b4fa"             # Blue
+  ZSH_HIGHLIGHT_STYLES[autodirectory]="fg=#fab387,italic"    # Peach
+  ZSH_HIGHLIGHT_STYLES[single-hyphen-option]="fg=#cdd6f4"    # Text
+  ZSH_HIGHLIGHT_STYLES[double-hyphen-option]="fg=#cdd6f4"    # Text
+  ZSH_HIGHLIGHT_STYLES[back-quoted-argument]="fg=#cba6f7"   # Mauve
+  # Strings
+  ZSH_HIGHLIGHT_STYLES[single-quoted-argument]="fg=#a6e3a1"  # Green
+  ZSH_HIGHLIGHT_STYLES[double-quoted-argument]="fg=#a6e3a1"  # Green
+  ZSH_HIGHLIGHT_STYLES[dollar-quoted-argument]="fg=#a6e3a1"  # Green
+  ZSH_HIGHLIGHT_STYLES[rc-quote]="fg=#94e2d5"                # Teal
+  ZSH_HIGHLIGHT_STYLES[dollar-double-quoted-argument]="fg=#fab387" # Peach
+  ZSH_HIGHLIGHT_STYLES[back-double-quoted-argument]="fg=#fab387"   # Peach
+  ZSH_HIGHLIGHT_STYLES[back-dollar-quoted-argument]="fg=#fab387"   # Peach
+  # Misc
+  ZSH_HIGHLIGHT_STYLES[globbing]="fg=#f9e2af"                # Yellow
+  ZSH_HIGHLIGHT_STYLES[history-expansion]="fg=#cba6f7"      # Mauve
+  ZSH_HIGHLIGHT_STYLES[command-substitution]="fg=#cdd6f4"    # Text
+  ZSH_HIGHLIGHT_STYLES[command-substitution-delimiter]="fg=#94e2d5" # Teal
+  ZSH_HIGHLIGHT_STYLES[process-substitution]="fg=#cdd6f4"    # Text
+  ZSH_HIGHLIGHT_STYLES[process-substitution-delimiter]="fg=#94e2d5" # Teal
+  ZSH_HIGHLIGHT_STYLES[comment]="fg=#6c7086,italic"          # Overlay0
+  ZSH_HIGHLIGHT_STYLES[named-fd]="fg=#cdd6f4"                # Text
+  ZSH_HIGHLIGHT_STYLES[numeric-fd]="fg=#cdd6f4"              # Text
+  ZSH_HIGHLIGHT_STYLES[redirection]="fg=#94e2d5"             # Teal
+  ZSH_HIGHLIGHT_STYLES[arg0]="fg=#cdd6f4"                    # Text
+  # Brackets
+  ZSH_HIGHLIGHT_STYLES[bracket-error]="fg=#f38ba8,bold"      # Red
+  ZSH_HIGHLIGHT_STYLES[bracket-level-1]="fg=#89b4fa,bold"    # Blue
+  ZSH_HIGHLIGHT_STYLES[bracket-level-2]="fg=#cba6f7,bold"   # Mauve
+  ZSH_HIGHLIGHT_STYLES[bracket-level-3]="fg=#a6e3a1,bold"    # Green
+  ZSH_HIGHLIGHT_STYLES[bracket-level-4]="fg=#f9e2af,bold"    # Yellow
+  ZSH_HIGHLIGHT_STYLES[cursor-matchingbracket]="fg=#1e1e2e,bg=#cba6f7" # Base on Mauve
+fi
+
 # ── Local overrides ───────────────────────────────────────────────────────────
 # Machine-local customisations — NOT tracked in dotfiles
 [ -f "$HOME/.zshrc.local" ] && source "$HOME/.zshrc.local"

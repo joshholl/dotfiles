@@ -54,10 +54,15 @@ return {
 
   -- 🧠 Better Lua LSP
   {
-    "folke/neodev.nvim",
+    "folke/lazydev.nvim",
     ft = "lua",
-    opts = {},
+    opts = {
+      library = {
+        { path = "luvit-meta/library", words = { "vim%.uv" } },
+      },
+    },
   },
+  { "Bilal2453/luvit-meta", lazy = true },
 
   -- 🔄 LSP progress UI
   {
@@ -76,13 +81,9 @@ return {
       "mason-lspconfig.nvim",
       "hrsh7th/cmp-nvim-lsp",
       "b0o/SchemaStore.nvim",
-      "folke/neodev.nvim",
     },
 
     config = function()
-      local lspconfig = require("lspconfig")
-
-      -- safe require
       local ok_schemastore, schemastore = pcall(require, "schemastore")
 
       local capabilities = vim.tbl_deep_extend(
@@ -131,16 +132,15 @@ return {
 
         -- ruff: Python linting/diagnostics via LSP (replaces nvim-lint for Python)
         ruff = {},
-
-        -- stylua: Lua formatter via LSP
-        stylua = {},
       }
 
-      for name, opts in pairs(servers) do
-        opts.on_attach = on_attach
-        opts.capabilities = capabilities
-        lspconfig[name].setup(opts)
+      for name, server_opts in pairs(servers) do
+        server_opts.on_attach = on_attach
+        server_opts.capabilities = capabilities
+        vim.lsp.config(name, server_opts)
       end
+
+      vim.lsp.enable(vim.tbl_keys(servers))
 
       -- diagnostics UI
       vim.diagnostic.config({
