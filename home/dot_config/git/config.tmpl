@@ -65,6 +65,9 @@
 [gpg "ssh"]
     program = "/Applications/1Password.app/Contents/MacOS/op-ssh-sign"
 
+[user]
+    signingkey = ~/.ssh/id_github.pub
+
 [commit]
     gpgsign = true
 {{ end }}
