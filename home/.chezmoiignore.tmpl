@@ -20,4 +20,6 @@
 {{ if not .personal }}
 .config/personal
 .chezmoiscripts/personal
+# Ollama runs as a local service on personal machines only
+Library/LaunchAgents/com.ollama.server.plist
 {{ end }}

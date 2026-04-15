@@ -29,6 +29,23 @@
 {{- $email := promptStringOnce . "email" "Email address" -}}
 
 {{/* ------------------------------------------------------------------ */}}
+{{/*  Hardware profile — selects AI model tier based on available RAM    */}}
+{{/* ------------------------------------------------------------------ */}}
+{{- $memGB := 0 -}}
+{{- if eq .chezmoi.os "darwin" -}}
+{{-   $memBytes := output "sysctl" "-n" "hw.memsize" | trim | atoi -}}
+{{-   $memGB = div $memBytes 1073741824 -}}
+{{- end -}}
+
+{{/* Primary model: heavy reasoning/chat/agentic work */}}
+{{- $ollamaPrimary := "qwen2.5-coder:7b" -}}
+{{- if ge $memGB 32 -}}
+{{-   $ollamaPrimary = "qwen2.5-coder:32b" -}}
+{{- else if ge $memGB 16 -}}
+{{-   $ollamaPrimary = "qwen2.5-coder:14b" -}}
+{{- end -}}
+
+{{/* ------------------------------------------------------------------ */}}
 {{/*  Config output                                                       */}}
 {{/* ------------------------------------------------------------------ */}}
 [data]
@@ -38,6 +55,12 @@
     osid     = {{ $osid | quote }}
     name     = {{ $name | quote }}
     email    = {{ $email | quote }}
+
+    # AI / Ollama — derived from hardware RAM ({{ $memGB }}GB detected)
+    memoryGB           = {{ $memGB }}
+    ollamaPrimaryModel = {{ $ollamaPrimary | quote }}
+    ollamaFillModel    = "qwen2.5-coder:1.5b"
+    ollamaEmbedModel   = "nomic-embed-text"
 
 [diff]
     exclude = ["scripts"]

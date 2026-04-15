@@ -1,0 +1,65 @@
+#!/bin/bash
+# {{ template "scripts-library" . }}
+true || source ../.chezmoitemplates/scripts-library
+# Trigger re-run when the model tier changes.
+# primary-model: {{ .ollamaPrimaryModel }}
+# fill-model:    {{ .ollamaFillModel }}
+# embed-model:   {{ .ollamaEmbedModel }}
+
+set -euo pipefail
+
+{{ if or (ne .chezmoi.os "darwin") (not .personal) -}}
+log_warn "AI tools setup only runs on personal macOS machines — skipping"
+exit 0
+{{- end }}
+
+# ── Aider ─────────────────────────────────────────────────────────────────────
+log_task "Installing aider-chat"
+if has_cmd uv; then
+  uv tool install --upgrade aider-chat
+  log_info "aider installed: $(aider --version 2>/dev/null || echo 'check PATH')"
+else
+  log_warn "uv not found — skipping aider install (run mise install first)"
+fi
+
+# ── Ollama models ─────────────────────────────────────────────────────────────
+log_task "Pulling Ollama models ({{ .ollamaPrimaryModel }}, {{ .ollamaFillModel }}, {{ .ollamaEmbedModel }})"
+
+if ! has_cmd ollama; then
+  log_warn "ollama not found — skipping model pull (run mise install first)"
+  exit 0
+fi
+
+# Start ollama in background if not already running
+STARTED_OLLAMA=false
+if ! curl -sf http://localhost:11434/api/tags >/dev/null 2>&1; then
+  log_info "Starting ollama server..."
+  ollama serve >/dev/null 2>&1 &
+  OLLAMA_PID=$!
+  STARTED_OLLAMA=true
+  # Wait for server to be ready
+  for i in $(seq 1 15); do
+    curl -sf http://localhost:11434/api/tags >/dev/null 2>&1 && break
+    sleep 1
+  done
+fi
+
+pull_if_missing() {
+  local model="$1"
+  if ollama list 2>/dev/null | awk '{print $1}' | grep -qx "${model}"; then
+    log_info "Already present: ${model}"
+  else
+    log_info "Pulling: ${model}"
+    ollama pull "${model}"
+  fi
+}
+
+pull_if_missing "{{ .ollamaPrimaryModel }}"
+pull_if_missing "{{ .ollamaFillModel }}"
+pull_if_missing "{{ .ollamaEmbedModel }}"
+
+if $STARTED_OLLAMA; then
+  kill "$OLLAMA_PID" 2>/dev/null || true
+fi
+
+log_info "AI tools setup complete"

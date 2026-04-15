@@ -69,6 +69,11 @@ atuin       = "latest"
 chezmoi     = "latest"
 
 {{ if .personal }}
+# Self-hosted model management — personal machines only (blocked on work)
+ollama     = "latest"
+{{ end }}
+
+{{ if .personal }}
 # Secrets — personal machines only
 age         = "latest"
 sops        = "latest"

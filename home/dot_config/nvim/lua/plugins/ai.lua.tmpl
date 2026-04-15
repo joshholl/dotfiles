@@ -1,0 +1,44 @@
+-- AI assistant: chat buffers, inline edits, agentic tasks
+-- Primary model: {{ .ollamaPrimaryModel }} ({{ .memoryGB }}GB RAM)
+--
+-- Keymaps (<leader>a prefix):
+--   <leader>ac  — toggle AI chat buffer
+--   <leader>aa  — action palette (n/v)
+--   <leader>ai  — inline AI edit (n/v)
+return {
+  {
+    "olimorris/codecompanion.nvim",
+    dependencies = {
+      "nvim-lua/plenary.nvim",
+      "nvim-treesitter/nvim-treesitter",
+    },
+    opts = {
+      strategies = {
+        chat   = { adapter = "local_ollama" },
+        inline = { adapter = "local_ollama" },
+        agent  = { adapter = "local_ollama" },
+      },
+      adapters = {
+        local_ollama = function()
+          return require("codecompanion.adapters").extend("ollama", {
+            schema = {
+              model = {
+                default = "{{ .ollamaPrimaryModel }}",
+              },
+            },
+          })
+        end,
+      },
+      display = {
+        chat = {
+          show_settings = true,
+        },
+      },
+    },
+    keys = {
+      { "<leader>ac", "<cmd>CodeCompanionChat Toggle<cr>",   desc = "AI chat" },
+      { "<leader>aa", "<cmd>CodeCompanionActions<cr>",       desc = "AI actions", mode = { "n", "v" } },
+      { "<leader>ai", "<cmd>CodeCompanion<cr>",              desc = "AI inline",  mode = { "n", "v" } },
+    },
+  },
+}

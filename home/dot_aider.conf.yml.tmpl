@@ -1,0 +1,17 @@
+# Aider configuration — managed by chezmoi
+# Machine: {{ .memoryGB }}GB RAM → primary model {{ .ollamaPrimaryModel }}
+# Docs: https://aider.chat/docs/config/aider_conf.html
+
+## Model selection
+# The primary model handles all coding tasks.
+# The weak model is used for cheaper tasks like generating commit messages.
+model: ollama/{{ .ollamaPrimaryModel }}
+weak-model: ollama/{{ .ollamaFillModel }}
+
+## Git
+auto-commits: true
+dirty-commits: true
+
+## Display
+pretty: true
+stream: true

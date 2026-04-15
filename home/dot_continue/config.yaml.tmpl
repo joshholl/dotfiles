@@ -1,0 +1,42 @@
+name: Local Ollama
+version: 1.0.0
+schema: v1
+
+models:
+  # Primary model — chat, inline edits, agentic tasks ({{ .memoryGB }}GB RAM → {{ .ollamaPrimaryModel }})
+  - name: {{ .ollamaPrimaryModel }}
+    provider: ollama
+    model: {{ .ollamaPrimaryModel }}
+    apiBase: http://localhost:11434
+    roles:
+      - chat
+      - edit
+      - apply
+      - summarize
+
+  # Fast autocomplete — stays hot in memory, sub-100ms completions
+  - name: {{ .ollamaFillModel }} (autocomplete)
+    provider: ollama
+    model: {{ .ollamaFillModel }}
+    apiBase: http://localhost:11434
+    roles:
+      - autocomplete
+    autocompleteOptions:
+      debounceDelay: 150
+      maxPromptTokens: 512
+
+  # Embeddings — used for @codebase RAG context
+  - name: {{ .ollamaEmbedModel }}
+    provider: ollama
+    model: {{ .ollamaEmbedModel }}
+    apiBase: http://localhost:11434
+    roles:
+      - embed
+
+context:
+  - provider: code
+  - provider: diff
+  - provider: terminal
+  - provider: problems
+  - provider: folder
+  - provider: codebase
