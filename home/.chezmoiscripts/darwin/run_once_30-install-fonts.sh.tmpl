@@ -28,11 +28,10 @@ else
     tmp=$(mktemp /tmp/fonts-XXXXXX.tar.xz)
     log_info "Downloading $URL..."
     curl -fsSL --location -o "$tmp" "$URL"
-    # Extract only the TTF files we want (Regular, Bold, Italic, BoldItalic)
-    tar -xf "$tmp" -C "$FONT_DIR" --include='*.ttf' 2>/dev/null || \
-      tar -xf "$tmp" -C "$FONT_DIR" '*.ttf' 2>/dev/null || \
-      tar -xJf "$tmp" -C "$FONT_DIR"
-    rm -f "$tmp"
+    tmpdir=$(mktemp -d /tmp/fonts-XXXXXX)
+    tar -xJf "$tmp" -C "$tmpdir"
+    find "$tmpdir" -name '*.ttf' -exec cp {} "$FONT_DIR/" \;
+    rm -rf "$tmp" "$tmpdir"
     log_info "Hack Nerd Font installed"
   fi
 fi

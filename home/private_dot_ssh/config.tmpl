@@ -8,23 +8,15 @@ Host *
     AddKeysToAgent       yes
     IdentitiesOnly       yes
     HashKnownHosts       yes
-
-{{ if .work }}
-# ── 1Password SSH agent — work machines ──────────────────────────────────────
-# The agent socket is set via SSH_AUTH_SOCK in shell/exports.sh.
-# Add public keys to 1Password and reference them here:
-#
-# Host github.com
-#     IdentityFile ~/.ssh/id_github.pub  # public key only — private stays in 1Password
+{{ if or .personal .work }}
+    IdentityAgent        "~/Library/Group Containers/2BUA8C4S2C.com.1password/t/agent.sock"
 {{ end }}
 
 # ── GitHub ────────────────────────────────────────────────────────────────────
 Host github.com
     User          git
     HostName      github.com
-{{ if .personal }}
-    IdentityFile  ~/.ssh/id_personal
-{{ end }}
+    IdentityFile  ~/.ssh/id_github.pub
 
 # ── GitLab ────────────────────────────────────────────────────────────────────
 Host gitlab.com

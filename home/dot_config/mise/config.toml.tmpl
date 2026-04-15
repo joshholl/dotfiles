@@ -5,7 +5,8 @@
 [settings]
 experimental = true              # required for aqua/ubi backends
 fetch_remote_versions_cache = "1d"   # only hit GitHub once per day
-fetch_remote_versions_timeout = "5"    # seconds before giving up silently
+fetch_remote_versions_timeout = "300"  # seconds before giving up silently
+http_timeout = "300"                 # seconds for binary downloads
 
 [tools]
 # Shell
@@ -42,6 +43,27 @@ docker-compose = "latest"
 
 # GitHub CLI
 "github-cli" = "latest"
+
+# Kubernetes
+kubectl     = "latest"
+k9s         = "latest"
+helm        = "latest"
+stern       = "latest"
+
+# JVM / Clojure
+java        = "temurin-21"
+clojure     = "latest"
+
+# Python tooling
+uv          = "latest"
+
+# Git / workflow
+lazygit     = "latest"
+just        = "latest"
+
+# Shell enhancements
+zoxide      = "latest"
+atuin       = "latest"
 
 # chezmoi — managed here so mise shim resolves after first bootstrap
 chezmoi     = "latest"

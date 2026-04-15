@@ -13,57 +13,20 @@ THEME_FILE="{{ .chezmoi.sourceDir }}/dot_config/terminal/catppuccin-mocha.termin
 
 log_task "Configuring Terminal.app"
 
-# ── Import profile into Terminal preferences ──────────────────────────────────
-# Terminal.app doesn't expose an AppleScript import command, so we use Python
-# to merge the .terminal plist directly into com.apple.Terminal preferences.
-log_info "Importing $PROFILE_NAME profile..."
-
-python3 << PYEOF
-import plistlib, subprocess, os, tempfile, sys
-
-theme_path = os.path.expanduser("$THEME_FILE")
-profile_name = "$PROFILE_NAME"
-
-if not os.path.exists(theme_path):
-    print(f"Theme file not found: {theme_path}", file=sys.stderr)
-    sys.exit(1)
-
-with open(theme_path, "rb") as f:
-    profile = plistlib.load(f)
-
-# Export current prefs so we can merge without clobbering other settings
-result = subprocess.run(
-    ["defaults", "export", "com.apple.Terminal", "-"],
-    capture_output=True,
-)
-try:
-    prefs = plistlib.loads(result.stdout)
-except Exception:
-    prefs = {}
-
-prefs.setdefault("Window Settings", {})[profile_name] = profile
-
-with tempfile.NamedTemporaryFile(suffix=".plist", delete=False, mode="wb") as f:
-    plistlib.dump(prefs, f, fmt=plistlib.FMT_XML)
-    tmp = f.name
-
-subprocess.run(["defaults", "import", "com.apple.Terminal", tmp], check=True)
-os.unlink(tmp)
-PYEOF
-
-# ── Set as default and startup profile ───────────────────────────────────────
-log_info "Setting $PROFILE_NAME as default profile..."
-defaults write com.apple.Terminal "Default Window Settings"  -string "$PROFILE_NAME"
-defaults write com.apple.Terminal "Startup Window Settings"  -string "$PROFILE_NAME"
-
-# ── Set font via AppleScript ──────────────────────────────────────────────────
-# Font is stored as binary NSFont archive in the plist — AppleScript is the
-# only clean way to set it without serialising NSFont data by hand.
-log_info "Setting font to Hack Nerd Font Mono (HackNFM-Regular, 13pt)..."
-osascript << 'ASEOF'
+# ── Import profile and configure via AppleScript ─────────────────────────────
+# Opening the .terminal file via AppleScript imports it into Terminal's live
+# memory immediately — avoiding the stale-cache problem with `defaults import`.
+# Font (NSFont archive) and default/startup profile are all set in one pass.
+log_info "Importing $PROFILE_NAME and configuring Terminal..."
+osascript << ASEOF
 tell application "Terminal"
-    set font name of settings set "catppuccin-mocha" to "HackNFM-Regular"
-    set font size of settings set "catppuccin-mocha" to 13
+    open POSIX file "$THEME_FILE"
+    delay 1
+    set theSettings to settings set "$PROFILE_NAME"
+    set font name of theSettings to "HackNFM-Regular"
+    set font size of theSettings to 13
+    set default settings to theSettings
+    set startup settings to theSettings
 end tell
 ASEOF
 

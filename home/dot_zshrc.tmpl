@@ -130,6 +130,16 @@ if [ -f "$_ZSH_PLUGIN_DIR/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh" ]
   ZSH_HIGHLIGHT_STYLES[cursor-matchingbracket]="fg=#1e1e2e,bg=#cba6f7" # Base on Mauve
 fi
 
+# ── zoxide (smart cd) ────────────────────────────────────────────────────────
+if command -v zoxide >/dev/null 2>&1; then
+  eval "$(zoxide init zsh)"
+fi
+
+# ── atuin (shell history) ─────────────────────────────────────────────────────
+if command -v atuin >/dev/null 2>&1; then
+  eval "$(atuin init zsh)"
+fi
+
 # ── Local overrides ───────────────────────────────────────────────────────────
 # Machine-local customisations — NOT tracked in dotfiles
 [ -f "$HOME/.zshrc.local" ] && source "$HOME/.zshrc.local"
