@@ -1,7 +1,7 @@
 #!/bin/bash
 # {{ template "scripts-library" . }}
 true || source ../../.chezmoitemplates/scripts-library
-
+{{ if .work }}
 log_task "Installing Homebrew packages"
 
 # Install Homebrew if missing
@@ -43,3 +43,5 @@ cask "font-jetbrains-mono-nerd-font"
 BREWFILE
 
 log_info "Homebrew packages installed"
+
+{{ end }}
