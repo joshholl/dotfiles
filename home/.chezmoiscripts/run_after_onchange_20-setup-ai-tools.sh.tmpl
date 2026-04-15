@@ -16,7 +16,7 @@ exit 0
 # ── Aider ─────────────────────────────────────────────────────────────────────
 log_task "Installing aider-chat"
 if has_cmd uv; then
-  uv tool install --upgrade aider-chat --no-build
+  uv tool install --upgrade aider-chat --no-build --python 3.14.4
   log_info "aider installed: $(aider --version 2>/dev/null || echo 'check PATH')"
 else
   log_warn "uv not found — skipping aider install (run mise install first)"
